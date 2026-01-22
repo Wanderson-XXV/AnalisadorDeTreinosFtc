@@ -1,0 +1,34 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --ftc-orange: #f97316;
+  --ftc-blue: #3b82f6;
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-slate-900 text-slate-100;
+  }
+}
+
+@layer utilities {
+  .ftc-gradient {
+    @apply bg-gradient-to-r from-orange-500 to-blue-500;
+  }
+  .ftc-glow {
+    box-shadow: 0 0 20px rgba(249, 115, 22, 0.3), 0 0 40px rgba(59, 130, 246, 0.2);
+  }
+}
+
+[data-hydration-error] {
+  display: none !important;
+}
+
+.timer-display {
+  font-variant-numeric: tabular-nums;
+}
