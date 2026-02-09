@@ -1,0 +1,68 @@
+/* Tailwind v4 - Import direto, sem arquivo de config */
+@import "tailwindcss";
+
+/* Variáveis de tema FTC */
+@theme {
+  --color-ftc-orange: #f97316;
+  --color-ftc-blue: #3b82f6;
+}
+
+/* Estilos base */
+* {
+  @apply border-slate-700;
+}
+
+body {
+  @apply bg-slate-900 text-slate-100 antialiased;
+}
+
+/* Gradiente FTC */
+.ftc-gradient {
+  @apply bg-gradient-to-r from-orange-500 to-blue-500;
+}
+
+/* Efeito de brilho FTC */
+.ftc-glow {
+  box-shadow: 
+    0 0 20px rgba(249, 115, 22, 0.15),
+    0 0 40px rgba(59, 130, 246, 0.1);
+}
+
+/* Timer display - números monoespaçados */
+.timer-display {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Esconder erros de hidratação */
+[data-hydration-error] {
+  display: none !important;
+}
+
+/* Esconder spinners de input number */
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type="number"] {
+  -moz-appearance: textfield;
+}
+
+/* Scrollbar customizada */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-slate-800;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-slate-600 rounded-full;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-slate-500;
+}
