@@ -1,12 +1,6 @@
-// Configuração da API
-// A URL muda automaticamente baseado no ambiente
+import { API_BASE } from '../config';
 
-// PRODUÇÃO (hospedagem)
-//export const API_BASE = '/techfenixscoutapp/api';
-//export const API_BASE = 'http://localhost:8000';
-
-// PRODUÇÃO (hospedagem) - descomente para build de produção
-export const API_BASE = '/techfenixscoutapp/api';
+export { API_BASE };
 
 export async function fetchApi<T>(endpoint: string, options?: RequestInit): Promise<T> {
   const response = await fetch(`${API_BASE}${endpoint}`, {

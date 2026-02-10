@@ -1,23 +1,57 @@
 // Tipos principais da aplicação
 
+export type CycleZone = 'near' | 'far' | null;
+export type RoundType = 'teleop_only' | 'full_match';
+export type RoundStrategy = 'near' | 'hybrid' | 'far' | null;
+
+export const BATTERIES = ['Rag1', 'Asas1'] as const;
+export type BatteryName = typeof BATTERIES[number];
+
+export const TELEOP_DURATION = 120000;
+export const AUTO_DURATION = 30000;
+export const TRANSITION_DURATION = 8000;
+export const FULL_MATCH_DURATION = AUTO_DURATION + TRANSITION_DURATION + TELEOP_DURATION;
+
+export function calculateStrategy(cycles: CycleData[]): RoundStrategy {
+  const validCycles = cycles.filter(c => c.zone !== null);
+  if (validCycles.length === 0) return null;
+  
+  const nearCount = validCycles.filter(c => c.zone === 'near').length;
+  const farCount = validCycles.filter(c => c.zone === 'far').length;
+  const total = validCycles.length;
+  
+  const nearPercent = nearCount / total;
+  const farPercent = farCount / total;
+  
+  if (nearPercent >= 0.7) return 'near';
+  if (farPercent >= 0.7) return 'far';
+  return 'hybrid';
+}
+
 export interface CycleData {
-  id?: string;
+  id: string;
+  roundId: string;
   cycleNumber: number;
-  duration: number; // em milissegundos
+  duration: number;
   hits: number;
   misses: number;
-  timestamp: number; // ms desde início do round
-  timeInterval: string; // "0-30s", "30-60s", etc.
+  timestamp: number;
+  timeInterval: string;
+  zone: CycleZone;
+  isAutonomous: boolean;
 }
 
 export interface RoundData {
   id: string;
-  start_time: string;
-  end_time?: string;
-  observations?: string;
-  total_duration?: number;
+  startTime: string;
+  endTime: string | null;
+  observations: string | null;
+  totalDuration: number | null;
   cycles: CycleData[];
-  created_at?: string;
+  roundType: RoundType;
+  batteryName: string | null;
+  batteryVolts: number | null;
+  strategy: RoundStrategy;
 }
 
 export interface GeneralStats {
@@ -62,3 +96,4 @@ export interface StatsData {
   dailyStats: DayStats[];
   evolutionData: EvolutionData[];
 }
+

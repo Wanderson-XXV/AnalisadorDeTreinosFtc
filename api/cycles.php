@@ -24,27 +24,33 @@ try {
             $hits = $body['hits'] ?? 0;
             $misses = $body['misses'] ?? 0;
             $timestamp = $body['timestamp'] ?? 0;
-            $timeInterval = getTimeInterval($timestamp);
+            $zone = $body['zone'] ?? null;
+            $isFullMatch = $body['isFullMatch'] ?? false;
             
             if (!$roundId) {
                 jsonError('roundId é obrigatório', 400);
             }
             
+            $timeInterval = getTimeInterval($timestamp, $isFullMatch);
+            $isAutonomous = ($isFullMatch && $timestamp < 30000) ? 1 : 0;
+            
             $stmt = $db->prepare("
-                INSERT INTO cycles (id, round_id, cycle_number, duration, hits, misses, timestamp, time_interval)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                INSERT INTO cycles (id, round_id, cycle_number, duration, hits, misses, timestamp, time_interval, zone, is_autonomous)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             ");
-            $stmt->execute([$id, $roundId, $cycleNumber, $duration, $hits, $misses, $timestamp, $timeInterval]);
+            $stmt->execute([$id, $roundId, $cycleNumber, $duration, $hits, $misses, $timestamp, $timeInterval, $zone, $isAutonomous]);
             
             jsonResponse([
                 'id' => $id,
-                'round_id' => $roundId,
-                'cycle_number' => $cycleNumber,
+                'roundId' => $roundId,
+                'cycleNumber' => $cycleNumber,
                 'duration' => $duration,
                 'hits' => $hits,
                 'misses' => $misses,
                 'timestamp' => $timestamp,
-                'time_interval' => $timeInterval
+                'timeInterval' => $timeInterval,
+                'zone' => $zone,
+                'isAutonomous' => $isAutonomous
             ], 201);
             break;
             

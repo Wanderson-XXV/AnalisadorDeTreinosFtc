@@ -73,19 +73,26 @@ try {
             $body = getRequestBody();
             $id = generateId();
             $startTime = $body['startTime'] ?? date('c');
+            $roundType = $body['roundType'] ?? 'teleop_only';
+            $batteryName = $body['batteryName'] ?? null;
+            $batteryVolts = isset($body['batteryVolts']) ? (float)$body['batteryVolts'] : null;
             
             $stmt = $db->prepare("
-                INSERT INTO rounds (id, start_time) VALUES (?, ?)
+                INSERT INTO rounds (id, start_time, round_type, battery_name, battery_volts) 
+                VALUES (?, ?, ?, ?, ?)
             ");
-            $stmt->execute([$id, $startTime]);
+            $stmt->execute([$id, $startTime, $roundType, $batteryName, $batteryVolts]);
             
             jsonResponse([
                 'id' => $id,
-                'start_time' => $startTime,
+                'startTime' => $startTime,
+                'roundType' => $roundType,
+                'batteryName' => $batteryName,
+                'batteryVolts' => $batteryVolts,
                 'cycles' => []
             ], 201);
             break;
-            
+                    
         case 'PATCH':
             if (!$id) {
                 jsonError('ID do round é obrigatório', 400);
@@ -107,6 +114,10 @@ try {
                 $updates[] = 'total_duration = ?';
                 $params[] = $body['totalDuration'];
             }
+            if (isset($body['strategy'])) {
+                $updates[] = 'strategy = ?';
+                $params[] = $body['strategy'];
+            }
             
             $updates[] = 'updated_at = ?';
             $params[] = date('c');
@@ -115,6 +126,13 @@ try {
             $sql = "UPDATE rounds SET " . implode(', ', $updates) . " WHERE id = ?";
             $stmt = $db->prepare($sql);
             $stmt->execute($params);
+            
+            $stmt = $db->prepare("SELECT * FROM rounds WHERE id = ?");
+            $stmt->execute([$id]);
+            $round = $stmt->fetch();
+            
+            jsonResponse($round);
+            break;
             
             // Retornar round atualizado
             $stmt = $db->prepare("SELECT * FROM rounds WHERE id = ?");

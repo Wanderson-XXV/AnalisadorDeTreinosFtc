@@ -1,19 +1,17 @@
-import { Calendar } from 'lucide-react';
-import type { DayStats } from '../lib/types';
-import { formatTime, formatDate } from '../lib/utils';
+import { Calendar, TrendingUp, Target, Clock } from 'lucide-react';
+import type { DailyStats } from '../lib/types';
+import { formatDuration } from '../lib/utils';
 
 interface DailyStatsTableProps {
-  data: DayStats[];
+  dailyStats: DailyStats[];
 }
 
-export function DailyStatsTable({ data }: DailyStatsTableProps) {
-  const safeData = data ?? [];
-
-  if (safeData.length === 0) {
+export function DailyStatsTable({ dailyStats }: DailyStatsTableProps) {
+  if (!dailyStats || dailyStats.length === 0) {
     return (
-      <div className="text-center py-8 text-slate-500">
-        <Calendar className="w-12 h-12 mx-auto mb-3 opacity-50" />
-        <p>Nenhum dado disponível</p>
+      <div className="text-center py-12 text-slate-500">
+        <Calendar className="w-16 h-16 mx-auto mb-4 opacity-50" />
+        <p className="text-lg">Nenhum dado disponível para o período selecionado</p>
       </div>
     );
   }
@@ -23,23 +21,84 @@ export function DailyStatsTable({ data }: DailyStatsTableProps) {
       <table className="w-full">
         <thead>
           <tr className="border-b border-slate-700">
-            <th className="text-left py-3 px-4 text-sm font-medium text-slate-400">Data</th>
-            <th className="text-center py-3 px-4 text-sm font-medium text-slate-400">Rounds</th>
-            <th className="text-center py-3 px-4 text-sm font-medium text-slate-400">Ciclos</th>
-            <th className="text-center py-3 px-4 text-sm font-medium text-slate-400">Tempo Médio</th>
+            <th className="text-left py-4 px-4 text-slate-400 font-medium">
+              <div className="flex items-center gap-2">
+                <Calendar className="w-4 h-4" />
+                Data
+              </div>
+            </th>
+            <th className="text-center py-4 px-4 text-slate-400 font-medium">
+              <div className="flex items-center justify-center gap-2">
+                <Target className="w-4 h-4" />
+                Rounds
+              </div>
+            </th>
+            <th className="text-center py-4 px-4 text-slate-400 font-medium">
+              <div className="flex items-center justify-center gap-2">
+                <TrendingUp className="w-4 h-4" />
+                Ciclos
+              </div>
+            </th>
+            <th className="text-center py-4 px-4 text-slate-400 font-medium">Acertos</th>
+            <th className="text-center py-4 px-4 text-slate-400 font-medium">Erros</th>
+            <th className="text-center py-4 px-4 text-slate-400 font-medium">Taxa</th>
+            <th className="text-center py-4 px-4 text-slate-400 font-medium">
+              <div className="flex items-center justify-center gap-2">
+                <Clock className="w-4 h-4" />
+                Tempo Médio
+              </div>
+            </th>
           </tr>
         </thead>
         <tbody>
-          {safeData.map((day) => (
-            <tr key={day.date} className="border-b border-slate-700/50 hover:bg-slate-700/30">
-              <td className="py-3 px-4 text-white">{formatDate(day.date)}</td>
-              <td className="py-3 px-4 text-center text-slate-300">{day.rounds}</td>
-              <td className="py-3 px-4 text-center text-slate-300">{day.totalCycles}</td>
-              <td className="py-3 px-4 text-center text-orange-400 font-medium">
-                {formatTime(day.avgCycleTime)}
-              </td>
-            </tr>
-          ))}
+          {dailyStats.map((day) => {
+            const accuracy = day.totalHits + day.totalMisses > 0
+              ? ((day.totalHits / (day.totalHits + day.totalMisses)) * 100).toFixed(1)
+              : '0.0';
+
+            return (
+              <tr
+                key={day.date}
+                className="border-b border-slate-700/50 hover:bg-slate-700/30 transition-colors"
+              >
+                <td className="py-4 px-4 text-white font-medium">
+                  {new Date(day.date).toLocaleDateString('pt-BR', {
+                    day: '2-digit',
+                    month: 'short',
+                    year: 'numeric',
+                  })}
+                </td>
+                <td className="py-4 px-4 text-center text-white font-bold">
+                  {day.totalRounds}
+                </td>
+                <td className="py-4 px-4 text-center text-white font-bold">
+                  {day.totalCycles}
+                </td>
+                <td className="py-4 px-4 text-center text-green-400 font-bold">
+                  {day.totalHits}
+                </td>
+                <td className="py-4 px-4 text-center text-red-400 font-bold">
+                  {day.totalMisses}
+                </td>
+                <td className="py-4 px-4 text-center">
+                  <span
+                    className={`font-bold ${
+                      parseFloat(accuracy) >= 80
+                        ? 'text-green-400'
+                        : parseFloat(accuracy) >= 60
+                        ? 'text-yellow-400'
+                        : 'text-red-400'
+                    }`}
+                  >
+                    {accuracy}%
+                  </span>
+                </td>
+                <td className="py-4 px-4 text-center text-slate-300 font-mono">
+                  {formatDuration(day.avgCycleTime)}
+                </td>
+              </tr>
+            );
+          })}
         </tbody>
       </table>
     </div>

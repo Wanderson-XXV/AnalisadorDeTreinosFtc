@@ -26,10 +26,9 @@ function getDB(): PDO {
         $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         $pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
         
-        // Criar tabelas se não existirem
         initDatabase($pdo);
+        runMigrations($pdo);
     }
-    
     return $pdo;
 }
 
@@ -83,9 +82,39 @@ function getRequestBody(): array {
     return json_decode($json, true) ?? [];
 }
 
-function getTimeInterval(int $timestamp): string {
-    if ($timestamp < 30000) return '0-30s';
-    if ($timestamp < 60000) return '30-60s';
-    if ($timestamp < 90000) return '60-90s';
+function getTimeInterval(int $timestamp, bool $isFullMatch = false): string {
+    if ($isFullMatch) {
+        if ($timestamp < 30000) {
+            return 'auto';
+        }
+        if ($timestamp < 38000) {
+            return 'transition';
+        }
+        $teleopTime = $timestamp - 38000;
+    } else {
+        $teleopTime = $timestamp;
+    }
+    
+    if ($teleopTime < 30000) return '0-30s';
+    if ($teleopTime < 60000) return '30-60s';
+    if ($teleopTime < 90000) return '60-90s';
     return '90-120s';
+}
+
+function runMigrations(PDO $pdo): void {
+    $migrations = [
+        "ALTER TABLE rounds ADD COLUMN round_type TEXT DEFAULT 'teleop_only'",
+        "ALTER TABLE rounds ADD COLUMN battery_name TEXT",
+        "ALTER TABLE rounds ADD COLUMN battery_volts REAL",
+        "ALTER TABLE rounds ADD COLUMN strategy TEXT",
+        "ALTER TABLE cycles ADD COLUMN zone TEXT",
+        "ALTER TABLE cycles ADD COLUMN is_autonomous INTEGER DEFAULT 0"
+    ];
+
+    foreach ($migrations as $sql) {
+        try {
+            $pdo->exec($sql);
+        } catch (PDOException $e) {
+        }
+    }
 }

@@ -1,8 +1,8 @@
 import { NavLink } from 'react-router';
-import { Timer, BarChart3, History, Trophy, Zap, Menu, X, ChevronLeft } from 'lucide-react';
+import { Timer, BarChart3, History, Trophy, Zap, Menu, X, ChevronLeft, Volume2, VolumeX } from 'lucide-react';
 import { cn } from '../lib/utils';
 import { useSidebar } from '../hooks/useSidebar';
-
+import { useSoundSettings } from '../hooks/useSoundSettings';
 const navItems = [
   { to: '/', label: 'Novo Round', icon: Timer },
   { to: '/dashboard', label: 'Dashboard', icon: BarChart3 },
@@ -15,7 +15,7 @@ const comingSoonItems = [
 
 export function Sidebar() {
   const { isOpen, isCollapsed, setIsOpen, toggleCollapse } = useSidebar();
-
+  const { soundEnabled, toggleSound } = useSoundSettings();
   return (
     <>
       <button
@@ -130,7 +130,24 @@ export function Sidebar() {
         </div>
 
         {!isCollapsed && (
-          <div className="absolute bottom-0 left-0 right-0 p-4">
+          <div className="absolute bottom-0 left-0 right-0 p-4 space-y-3">
+            <button
+              onClick={toggleSound}
+              className="w-full flex items-center justify-center gap-2 bg-slate-700/50 hover:bg-slate-700 rounded-lg p-3 transition-colors"
+            >
+              {soundEnabled ? (
+                <>
+                  <Volume2 className="w-5 h-5 text-green-400" />
+                  <span className="text-sm text-slate-300">Sons Ativados</span>
+                </>
+              ) : (
+                <>
+                  <VolumeX className="w-5 h-5 text-slate-400" />
+                  <span className="text-sm text-slate-400">Sons Desativados</span>
+                </>
+              )}
+            </button>
+            
             <div className="bg-slate-700/50 rounded-lg p-3 text-center">
               <p className="text-xs text-slate-400">Dica: Pressione</p>
               <p className="text-sm font-mono text-orange-400">ESPAÇO</p>
