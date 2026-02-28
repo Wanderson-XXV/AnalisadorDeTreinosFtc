@@ -4,7 +4,7 @@ export type CycleZone = 'near' | 'far' | null;
 export type RoundType = 'teleop_only' | 'full_match';
 export type RoundStrategy = 'near' | 'hybrid' | 'far' | null;
 
-export const BATTERIES = ['Rag1', 'Asas1', 'Alpha1'] as const;
+export const BATTERIES = ['Rag1', 'Asas1', 'Alpha1', 'Tech1', 'Tech2','Tech3','Tech4', 'Benfica'] as const;
 export type BatteryName = typeof BATTERIES[number];
 
 export const TELEOP_DURATION = 120000;
