@@ -74,7 +74,13 @@ try {
     $hitRate = ($totalHits + $totalMisses) > 0 
         ? ($totalHits / ($totalHits + $totalMisses)) * 100 
         : 0;
-    
+    $personalBest = 0;
+    foreach ($completedRounds as $round) {
+        $roundHits = array_sum(array_column($round['cycles'], 'hits'));
+        if ($roundHits > $personalBest) {
+            $personalBest = $roundHits;
+        }
+    }
     // Estatísticas por intervalo
     $intervals = ['0-30s', '30-60s', '60-90s', '90-120s'];
     $statsByInterval = [];
@@ -94,27 +100,31 @@ try {
         ];
     }
     
-    // Estatísticas por dia
+   // Estatísticas por dia
     $statsByDay = [];
     foreach ($completedRounds as $round) {
         $dateKey = substr($round['start_time'], 0, 10);
         if (!isset($statsByDay[$dateKey])) {
-            $statsByDay[$dateKey] = ['rounds' => 0, 'cycles' => 0, 'totalTime' => 0];
+            $statsByDay[$dateKey] = ['rounds' => 0, 'cycles' => 0, 'totalTime' => 0, 'hits' => 0, 'misses' => 0];
         }
         $statsByDay[$dateKey]['rounds']++;
         $statsByDay[$dateKey]['cycles'] += count($round['cycles']);
         $statsByDay[$dateKey]['totalTime'] += array_sum(array_column($round['cycles'], 'duration'));
+        $statsByDay[$dateKey]['hits'] += array_sum(array_column($round['cycles'], 'hits'));
+        $statsByDay[$dateKey]['misses'] += array_sum(array_column($round['cycles'], 'misses'));
     }
-    
-    $dailyStats = [];
-    foreach ($statsByDay as $date => $data) {
-        $dailyStats[] = [
-            'date' => $date,
-            'rounds' => $data['rounds'],
-            'totalCycles' => $data['cycles'],
-            'avgCycleTime' => $data['cycles'] > 0 ? $data['totalTime'] / $data['cycles'] : 0
-        ];
-    }
+
+ $dailyStats = [];
+foreach ($statsByDay as $date => $data) {
+    $dailyStats[] = [
+        'date' => $date,
+        'rounds' => $data['rounds'],
+        'totalCycles' => $data['cycles'],
+        'avgCycleTime' => $data['cycles'] > 0 ? $data['totalTime'] / $data['cycles'] : 0,
+        'totalHits' => $data['hits'],
+        'totalMisses' => $data['misses']
+    ];
+}
     usort($dailyStats, fn($a, $b) => strcmp($b['date'], $a['date']));
     
     // Dados de evolução
@@ -143,7 +153,7 @@ try {
             'avgCyclesPerRound' => round($avgCyclesPerRound, 1),
             'avgCycleTime' => round($avgCycleTime),
             'minCycleTime' => $minCycleTime,
-            'maxCycleTime' => $maxCycleTime,
+            'personalBest' => $personalBest,
             'totalHits' => $totalHits,
             'totalMisses' => $totalMisses,
             'hitRate' => round($hitRate, 1)

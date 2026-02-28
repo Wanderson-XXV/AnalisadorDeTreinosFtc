@@ -11,7 +11,7 @@ export default function HomePage() {
     <div className="min-h-screen flex">
       <Sidebar />
       <main className={cn(
-        'flex-1 p-8 pt-20 lg:pt-8 transition-all duration-300',
+        'flex-1 p-4 sm:p-6 lg:p-8 pt-20 lg:pt-8 transition-all duration-300 overflow-x-hidden',
         isCollapsed ? 'lg:ml-20' : 'lg:ml-64'
       )}>
         <div className="max-w-4xl mx-auto">

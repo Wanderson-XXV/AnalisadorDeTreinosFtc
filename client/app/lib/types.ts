@@ -4,7 +4,7 @@ export type CycleZone = 'near' | 'far' | null;
 export type RoundType = 'teleop_only' | 'full_match';
 export type RoundStrategy = 'near' | 'hybrid' | 'far' | null;
 
-export const BATTERIES = ['Rag1', 'Asas1'] as const;
+export const BATTERIES = ['Rag1', 'Asas1', 'Alpha1'] as const;
 export type BatteryName = typeof BATTERIES[number];
 
 export const TELEOP_DURATION = 120000;
@@ -60,7 +60,7 @@ export interface GeneralStats {
   avgCyclesPerRound: number;
   avgCycleTime: number;
   minCycleTime: number;
-  maxCycleTime: number;
+  personalBest: number;
   totalHits: number;
   totalMisses: number;
   hitRate: number;
@@ -79,6 +79,8 @@ export interface DayStats {
   rounds: number;
   totalCycles: number;
   avgCycleTime: number;
+  totalHits: number;
+  totalMisses: number;
 }
 
 export interface EvolutionData {

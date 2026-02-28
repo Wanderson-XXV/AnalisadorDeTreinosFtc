@@ -1,8 +1,7 @@
 <?php
 require_once 'config.php';
 
-$pdo = new PDO('sqlite:' . DB_PATH);
-$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+$pdo = getDB();
 
 echo "=== MIGRANDO DADOS DO PRISMA PARA PHP API ===\n\n";
 
@@ -12,11 +11,11 @@ function convertTimestamp($ms) {
 }
 
 try {
+    $pdo->beginTransaction();
+    
     $pdo->exec("DELETE FROM cycles");
     $pdo->exec("DELETE FROM rounds");
     echo "Tabelas limpas.\n\n";
-    
-    $pdo->beginTransaction();
     
     echo "1. Migrando Rounds...\n";
     $oldRounds = $pdo->query("SELECT * FROM Round")->fetchAll();
@@ -43,20 +42,33 @@ try {
     $oldCycles = $pdo->query("SELECT * FROM Cycle")->fetchAll();
     
     $stmt = $pdo->prepare("
-        INSERT INTO cycles (id, round_id, cycle_number, duration, hits, misses, timestamp, time_interval, created_at, is_autonomous)
-        VALUES (:id, :round_id, :cycle_number, :duration, :hits, :misses, :timestamp, :time_interval, :created_at, 0)
+        INSERT INTO cycles (id, round_id, cycle_number, duration, hits, misses, timestamp, time_interval, created_at)
+        VALUES (:id, :round_id, :cycle_number, :duration, :hits, :misses, :timestamp, :time_interval, :created_at)
     ");
     
+    $cycleNumber = 1;
+    $lastRoundId = null;
+    
     foreach ($oldCycles as $cycle) {
+        if ($cycle['roundId'] !== $lastRoundId) {
+            $cycleNumber = 1;
+            $lastRoundId = $cycle['roundId'];
+        }
+        
+        $totalHits = ($cycle['coneHigh'] ?? 0) + ($cycle['coneMid'] ?? 0) + ($cycle['coneLow'] ?? 0) 
+                   + ($cycle['cubeHigh'] ?? 0) + ($cycle['cubeMid'] ?? 0) + ($cycle['cubeLow'] ?? 0);
+        
+        $timestamp = intval($cycle['createdAt']);
+        
         $stmt->execute([
             ':id' => $cycle['id'],
             ':round_id' => $cycle['roundId'],
-            ':cycle_number' => $cycle['cycleNumber'],
+            ':cycle_number' => $cycleNumber++,
             ':duration' => $cycle['duration'],
-            ':hits' => $cycle['hits'],
-            ':misses' => $cycle['misses'],
-            ':timestamp' => $cycle['timestamp'],
-            ':time_interval' => $cycle['timeInterval'],
+            ':hits' => $totalHits,
+            ':misses' => $cycle['failedAttempts'] ?? 0,
+            ':timestamp' => $timestamp,
+            ':time_interval' => getTimeInterval($timestamp),
             ':created_at' => convertTimestamp($cycle['createdAt'])
         ]);
     }
@@ -68,6 +80,9 @@ try {
     echo "Total: " . count($oldRounds) . " rounds e " . count($oldCycles) . " cycles\n";
     
 } catch (Exception $e) {
-    $pdo->rollBack();
+    if ($pdo->inTransaction()) {
+        $pdo->rollBack();
+    }
     echo "ERRO: " . $e->getMessage() . "\n";
+    echo $e->getTraceAsString() . "\n";
 }

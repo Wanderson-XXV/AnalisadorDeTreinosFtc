@@ -1,9 +1,9 @@
 import { Calendar, TrendingUp, Target, Clock } from 'lucide-react';
-import type { DailyStats } from '../lib/types';
+import type { DayStats } from '../lib/types';
 import { formatDuration } from '../lib/utils';
 
 interface DailyStatsTableProps {
-  dailyStats: DailyStats[];
+  dailyStats: DayStats[];
 }
 
 export function DailyStatsTable({ dailyStats }: DailyStatsTableProps) {
@@ -69,7 +69,7 @@ export function DailyStatsTable({ dailyStats }: DailyStatsTableProps) {
                   })}
                 </td>
                 <td className="py-4 px-4 text-center text-white font-bold">
-                  {day.totalRounds}
+                  {day.rounds}
                 </td>
                 <td className="py-4 px-4 text-center text-white font-bold">
                   {day.totalCycles}

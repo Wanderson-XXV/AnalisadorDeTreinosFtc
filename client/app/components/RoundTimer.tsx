@@ -4,6 +4,7 @@ import { TimerDisplay } from './TimerDisplay';
 import { CycleModal } from './CycleModal';
 import { CycleList } from './CycleList';
 import type { CycleData, CycleZone, RoundType } from '../lib/types';
+import { AUDIO_EVENTS } from '../lib/audioConfig';
 import { 
   BATTERIES, 
   TELEOP_DURATION, 
@@ -32,9 +33,8 @@ export function RoundTimer() {
   const startTimeRef = useRef<number>(0);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
-  const audioRef = useRef<HTMLAudioElement | null>(null);
-  const phaseTransitionSoundRef = useRef<HTMLAudioElement | null>(null);
-  const endMatchSoundRef = useRef<HTMLAudioElement | null>(null);
+  const audioCache = useRef<Map<string, HTMLAudioElement>>(new Map());
+  const playedTimestamps = useRef<Set<number>>(new Set());
   
   const [roundType, setRoundType] = useState<RoundType>('teleop_only');
   const [batteryName, setBatteryName] = useState<string | null>(null);
@@ -49,23 +49,7 @@ export function RoundTimer() {
       setCurrentPhase(roundType === 'full_match' ? 'auto' : 'teleop');
     }
   }, [roundType, isRunning, roundId]);
-  useEffect(() => {
-    audioRef.current = new Audio();
-    phaseTransitionSoundRef.current = new Audio();
-    endMatchSoundRef.current = new Audio();
-    
-    const loadAudio = async () => {
-      try {
-        if (audioRef.current) audioRef.current.src = '/beep.mp3';
-        if (phaseTransitionSoundRef.current) phaseTransitionSoundRef.current.src = '/phase-transition.mp3';
-        if (endMatchSoundRef.current) endMatchSoundRef.current.src = '/end-match.mp3';
-      } catch (e) {
-        console.log('Audio files not loaded yet');
-      }
-    };
-    
-    loadAudio();
-  }, []);
+  
 
   const getPhaseFromTime = (time: number): MatchPhase => {
     if (roundType === 'teleop_only') {
@@ -78,63 +62,74 @@ export function RoundTimer() {
     return 'overtime';
   };
 
-  useEffect(() => {
-    if (isRunning) {
-      startTimeRef.current = Date.now() - elapsedTime;
-      intervalRef.current = setInterval(() => {
-        const newElapsed = Date.now() - startTimeRef.current;
-        setElapsedTime(newElapsed);
-        
-        const newPhase = getPhaseFromTime(newElapsed);
-        if (newPhase !== currentPhase) {
-          setCurrentPhase(newPhase);
-          
-          if (soundEnabled) {
-            if (newPhase === 'transition') {
-              phaseTransitionSoundRef.current?.play().catch(() => {});
-              setLastCycleEnd(newElapsed);
-            } else if (newPhase === 'teleop' && roundType === 'full_match') {
-              phaseTransitionSoundRef.current?.play().catch(() => {});
-              setLastCycleEnd(newElapsed);
-            } else if (newPhase === 'overtime') {
-              endMatchSoundRef.current?.play().catch(() => {});
-            }
-          }
-        }
-        
-        if (soundEnabled) {
-          if (roundType === 'full_match') {
-            const remaining = FULL_MATCH_DURATION - newElapsed;
-            if (remaining <= 3000 && remaining > 2900 && newPhase !== 'overtime') {
-              audioRef.current?.play().catch(() => {});
-            }
-          } else {
-            const remaining = TELEOP_DURATION - newElapsed;
-            if (remaining <= 3000 && remaining > 2900 && newPhase !== 'overtime') {
-              audioRef.current?.play().catch(() => {});
-            }
-          }
-        }
-      }, 10);
-    } else {
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current);
-      }
-    }
-    return () => {
-      if (intervalRef.current) clearInterval(intervalRef.current);
-    };
-  }, [isRunning, currentPhase, roundType, soundEnabled]);
-  
-  const handleMarkCycle = useCallback(() => {
-    if (!isRunning || currentPhase === 'transition') return;
-    const currentTime = elapsedTime ?? 0;
-    const cycleDuration = currentTime - (lastCycleEnd ?? 0);
-    setPendingCycle({ duration: cycleDuration, timestamp: currentTime });
-    setEditingCycle(null);
-    setShowModal(true);
-  }, [isRunning, elapsedTime, lastCycleEnd, currentPhase]);
+useEffect(() => {
+  AUDIO_EVENTS.forEach(event => {
+    const audio = new Audio(event.file);
+    audioCache.current.set(event.file, audio);
+  });
+}, []);
 
+useEffect(() => {
+  if (!isRunning) {
+    playedTimestamps.current.clear();
+  }
+}, [isRunning]);
+
+useEffect(() => {
+  if (isRunning) {
+    startTimeRef.current = Date.now() - elapsedTime;
+    intervalRef.current = setInterval(() => {
+      const newElapsed = Date.now() - startTimeRef.current;
+      setElapsedTime(newElapsed);
+      
+      const newPhase = getPhaseFromTime(newElapsed);
+      if (newPhase !== currentPhase) {
+        setCurrentPhase(newPhase);
+        if (newPhase === 'transition' || (newPhase === 'teleop' && roundType === 'full_match')) {
+          setLastCycleEnd(newElapsed);
+        }
+      }
+      
+      if (soundEnabled) {
+        AUDIO_EVENTS.forEach(event => {
+          if (event.modes.includes(roundType) && !playedTimestamps.current.has(event.timestamp)) {
+            const tolerance = 100;
+            if (Math.abs(newElapsed - event.timestamp) <= tolerance) {
+              audioCache.current.get(event.file)?.play().catch(() => {});
+              playedTimestamps.current.add(event.timestamp);
+            }
+          }
+        });
+      }
+    }, 10);
+  } else {
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+    }
+  }
+  return () => {
+    if (intervalRef.current) clearInterval(intervalRef.current);
+  };
+}, [isRunning, currentPhase, roundType, soundEnabled]);
+  
+const handleMarkCycle = useCallback(() => {
+  if (!isRunning) return;
+  const currentTime = elapsedTime ?? 0;
+  
+  let adjustedTime = currentTime;
+  let adjustedDuration = currentTime - (lastCycleEnd ?? 0);
+  
+  if (currentPhase === 'transition') {
+    adjustedTime = AUTO_DURATION - 1000;
+    adjustedDuration = adjustedTime - (lastCycleEnd ?? 0);
+  }
+  
+  setPendingCycle({ duration: adjustedDuration, timestamp: adjustedTime });
+  setEditingCycle(null);
+  setShowModal(true);
+}, [isRunning, elapsedTime, lastCycleEnd, currentPhase]);
+
+// if (isRunning) handleMarkCycle();
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -142,17 +137,14 @@ export function RoundTimer() {
       
       if (e.code === 'Space' && !showModal && !isTextareaFocused) {
         e.preventDefault();
-        if (isRunning && currentPhase !== 'transition') handleMarkCycle();
+        if (isRunning) handleMarkCycle();
       }
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [isRunning, showModal, elapsedTime, lastCycleEnd, currentPhase]);
 
-    const handleStart = async () => {
-    if (soundEnabled) {
-      audioRef.current?.play().then(() => audioRef.current?.pause()).catch(() => {});
-    }
+    const handleStart = async () => { 
     try {
       const response = await fetch(`${API_BASE}/rounds.php`, {
         method: 'POST',
@@ -389,15 +381,10 @@ export function RoundTimer() {
           <>
             <button
               onClick={handleMarkCycle}
-              disabled={currentPhase === 'transition'}
-              className={`flex items-center gap-2 px-12 py-6 rounded-xl font-bold text-xl transition-all shadow-lg ${
-                currentPhase === 'transition'
-                  ? 'bg-slate-600 text-slate-400 cursor-not-allowed'
-                  : 'ftc-gradient hover:opacity-90 text-white ftc-glow'
-              }`}
+              className="flex items-center gap-2 px-6 sm:px-12 py-4 sm:py-6 rounded-xl bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-400 hover:to-amber-400 text-white font-bold text-lg sm:text-xl transition-all shadow-lg hover:shadow-orange-500/25"
             >
-              <Flag className="w-7 h-7" />
-              Marcar Ciclo (Espaço)
+              <Flag className="w-6 h-6 sm:w-7 sm:h-7" />
+              <span className="whitespace-nowrap">Marcar Ciclo (Espaço)</span>
             </button>
             <button
               onClick={handleFinish}

@@ -260,7 +260,7 @@ export function HistoryContent() {
                         <tbody>
                           {(round.cycles ?? []).map((cycle) => (
                             <tr 
-                              key={cycle.id} 
+                              key={cycle.id}
                               className={cn(
                                 "border-b border-slate-700/50",
                                 cycle.isAutonomous && "bg-yellow-500/5"

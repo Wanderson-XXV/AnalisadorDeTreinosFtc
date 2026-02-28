@@ -106,7 +106,7 @@ export function DashboardContent() {
           <Calendar className="w-5 h-5 text-purple-400" />
           <h3 className="text-lg font-bold text-white">Estatísticas por Dia</h3>
         </div>
-        <DailyStatsTable data={stats.dailyStats} />
+        <DailyStatsTable dailyStats={stats.dailyStats} />
       </div>
     </div>
   );

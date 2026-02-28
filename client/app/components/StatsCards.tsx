@@ -51,9 +51,9 @@ export function StatsCards({ stats }: StatsCardsProps) {
       bg: 'from-emerald-500/20 to-emerald-600/10',
     },
     {
-      label: 'Maior Tempo',
-      value: formatTime(stats?.maxCycleTime ?? 0),
-      icon: TrendingUp,
+      label: 'Personal Best',
+      value: stats?.personalBest ?? 0,
+      icon: Target,
       color: 'text-rose-400',
       bg: 'from-rose-500/20 to-rose-600/10',
     },
