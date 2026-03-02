@@ -1,7 +1,7 @@
 import { cn } from '../lib/utils';
 import type { RoundType } from '../lib/types';
 import { AUTO_DURATION, TRANSITION_DURATION, TELEOP_DURATION, FULL_MATCH_DURATION } from '../lib/types';
-
+import { BASE_PATH } from '../config';
 type MatchPhase = 'auto' | 'transition' | 'teleop' | 'overtime';
 
 interface TimerDisplayProps {
@@ -63,13 +63,12 @@ export function TimerDisplay({ timeMs, isRunning, totalMs, roundType, currentPha
   const intervalSeconds = Math.floor(intervalTime / 1000);
   const intervalDisplay = `${Math.floor(intervalSeconds / 60)}:${(intervalSeconds % 60).toString().padStart(2, '0')}`;
 
-  const phaseIcons = {
-    auto: '/autom.png',
-    transition: '/transition.png',
-    teleop: '/teleop.png',
-    overtime: '/teleop.png'
-  };
-
+const phaseIcons = {
+  auto: `${BASE_PATH}/autom.png`,
+  transition: `${BASE_PATH}/transition.png`,
+  teleop: `${BASE_PATH}/teleop.png`,
+  overtime: `${BASE_PATH}/teleop.png`
+};
   const phaseLabels = {
     auto: 'AUTÔNOMO',
     transition: 'TRANSIÇÃO',
