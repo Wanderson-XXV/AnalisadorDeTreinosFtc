@@ -1,5 +1,4 @@
-// Tipos principais da aplicação
-
+// Tipos existentes (treinos) — mantidos integralmente
 export type CycleZone = 'near' | 'far' | null;
 export type RoundType = 'teleop_only' | 'full_match';
 export type RoundStrategy = 'near' | 'hybrid' | 'far' | null;
@@ -99,3 +98,130 @@ export interface StatsData {
   evolutionData: EvolutionData[];
 }
 
+// ============================================================
+// TIPOS DE CAMPEONATO (NOVOS)
+// ============================================================
+
+export type MatchType = 'qualification' | 'elimination';
+export type MatchStatus = 'scheduled' | 'in_progress' | 'completed';
+export type LogoPosition = 'center' | 'top' | 'bottom' | 'left' | 'right' | 'contain' | 'cover';
+
+export interface Team {
+  id: number;
+  team_number: number;
+  team_name: string;
+  logo_url?: string;
+  logo_position: LogoPosition;
+  instagram?: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface TeamFormData {
+  team_number: number;
+  team_name: string;
+  logo_url?: string;
+  logo_position?: LogoPosition;
+  instagram?: string;
+}
+
+export interface Scout {
+  id: string;
+  username: string;
+  photo_path?: string;
+  created_at: string;
+  last_active?: string;
+}
+
+export interface TeamInMatch {
+  number: number;
+  name?: string;
+}
+
+export interface AllianceData {
+  team1: TeamInMatch;
+  team2: TeamInMatch;
+  scoreAuto: number;
+  scoreTeleop: number;
+  penalties: number;
+  total: number;
+}
+
+export interface Match {
+  id: string;
+  championship_id?: string;
+  match_type: MatchType;
+  match_number: number;
+  display_name: string;
+  red_team1_number: number;
+  red_team1_name?: string;
+  red_team2_number: number;
+  red_team2_name?: string;
+  blue_team1_number: number;
+  blue_team1_name?: string;
+  blue_team2_number: number;
+  blue_team2_name?: string;
+  red_score_auto: number;
+  red_score_teleop: number;
+  red_penalties: number;
+  red_total: number;
+  blue_score_auto: number;
+  blue_score_teleop: number;
+  blue_penalties: number;
+  blue_total: number;
+  scheduled_time?: string;
+  actual_start_time?: string;
+  status: MatchStatus;
+  notes?: string;
+  created_at: string;
+  updated_at: string;
+  scouting_rounds?: ScoutingRound[];
+}
+
+export interface ScoutingRound {
+  id: string;
+  match_id: string;
+  team_number: number;
+  scout_id?: string;
+  scout_username?: string;
+  start_time: string;
+  end_time?: string;
+  total_duration?: number;
+  observations?: string;
+  robot_issues?: string;
+  strategy_notes?: string;
+  is_locked: boolean;
+  locked_at?: string;
+  cycles: ScoutingCycle[];
+}
+
+export interface ScoutingCycle {
+  id: string;
+  scouting_round_id: string;
+  cycle_number: number;
+  duration: number;
+  timestamp: number;
+  time_interval: string;
+  is_autonomous: boolean;
+  hits: number;
+  misses: number;
+  zone: CycleZone;
+  action_type?: string;
+  notes?: string;
+}
+
+export interface TeamStats {
+  team_number: number;
+  team_name?: string;
+  matches_scouted: number;
+  auto_hits: number;
+  auto_misses: number;
+  avg_auto_cycle_time: number;
+  teleop_hits: number;
+  teleop_misses: number;
+  avg_teleop_cycle_time: number;
+  total_hits: number;
+  total_misses: number;
+  hit_rate: number;
+  avg_cycles_per_match: number;
+}

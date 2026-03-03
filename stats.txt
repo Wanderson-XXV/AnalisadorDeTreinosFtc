@@ -1,0 +1,25 @@
+PASSO 1 — Foundation (Backend) ← começamos agora
+
+Adicionar migrations das novas tabelas em config.php (teams, scouts, matches, scouting_rounds, scouting_cycles)
+Criar api/teams.php (CRUD completo)
+Adicionar tipos Team em types.ts
+Teste: conseguir criar/listar equipes via API
+PASSO 2 — Auth simples
+
+api/scouts.php (create/get por username)
+useAuth.ts + LoginForm.tsx
+Teste: login persiste no localStorage, scout salvo no banco
+PASSO 3 — Matches CRUD
+
+api/matches.php
+useMatches.ts + rewrite de championships.tsx com lista + form de criar partida
+Teste: criar partida, ver na lista
+PASSO 4 — Scouting flow (o núcleo)
+
+api/scouting.php (rounds + cycles + lock)
+MatchModal.tsx básico com botão "Scout This Team"
+ChampionshipTimer.tsx (RoundTimer adaptado com header de partida/equipe)
+Teste: fluxo completo de scouting de uma equipe numa partida
+PASSO 5 — Stats + polish (próxima conversa)
+
+scouting-stats.php, comparação de equipes, etc.

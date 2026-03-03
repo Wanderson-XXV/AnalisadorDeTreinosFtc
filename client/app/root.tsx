@@ -1,4 +1,3 @@
-// app/root.tsx
 import {
   Links,
   Meta,
@@ -9,6 +8,8 @@ import {
 import type { LinksFunction } from "react-router";
 import "./styles/app.css";
 import { SidebarProvider } from "./hooks/useSidebar";
+import { useAuth } from './hooks/useAuth';
+import { LoginForm } from './components/auth/LoginForm';
 
 export const links: LinksFunction = () => [
   { rel: "icon", href: "/favicon.ico", type: "image/svg+xml" },
@@ -33,6 +34,11 @@ export function Layout({ children }: { children: React.ReactNode }) {
 }
 
 export default function App() {
+  const { scout, loading, login } = useAuth();
+
+  if (loading) return null;
+  if (!scout) return <LoginForm onLogin={login} />;
+
   return (
     <SidebarProvider>
       <Outlet />
