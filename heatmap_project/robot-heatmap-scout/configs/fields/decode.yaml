@@ -1,0 +1,194 @@
+field:
+  id: arena
+  name: Arena
+  image: assets\arenas\decode_hd_2.png
+  unit: cm
+  width: 365.76
+  height: 365.76
+  coordinate_system:
+    origin: top_left
+    x_axis: right
+    y_axis: down
+reference_points:
+  top_left:
+    label: Canto superior esquerdo
+    point:
+    - 0
+    - 0
+  top_right:
+    label: Canto superior direito
+    point:
+    - 365.76
+    - 0
+  bottom_right:
+    label: Canto inferior direito
+    point:
+    - 365.76
+    - 365.76
+  bottom_left:
+    label: Canto inferior esquerdo
+    point:
+    - 0
+    - 365.76
+  red_base_top_left:
+    label: red base tl
+    point:
+    - 76
+    - 259
+  red_base_top_right:
+    label: red base tr
+    point:
+    - 119
+    - 259
+  red_base_bottom_left:
+    label: red base bl
+    point:
+    - 76
+    - 303
+  red_base_bottom_right:
+    label: red base br
+    point:
+    - 120
+    - 303
+  center:
+    label: center
+    point:
+    - 183
+    - 185
+  loading_zone_top_right:
+    label: loading zone tr
+    point:
+    - 58
+    - 308
+  far_zone_top:
+    label: far zone top
+    point:
+    - 183
+    - 305
+  ponto:
+    label: red_tunnel_top
+    point:
+    - 15
+    - 185
+  blue_tunnel_top:
+    label: blue tunnel top
+    point:
+    - 351
+    - 184
+  top_center:
+    label: top center
+    point:
+    - 183
+    - 3
+zones:
+  close_zone:
+    label: close zone
+    type: polygon
+    role: score
+    alliance: neutral
+    visual:
+      color: score
+      opacity: 0.18
+      border: true
+      label: true
+    analysis:
+      count_time: true
+      detect_stops: true
+      important: true
+    points:
+    - - 183
+      - 183
+    - - 2
+      - 2
+    - - 364
+      - 2
+  far_zone:
+    label: far zone
+    type: polygon
+    role: score
+    alliance: neutral
+    visual:
+      color: score
+      opacity: 0.18
+      border: true
+      label: true
+    analysis:
+      count_time: true
+      detect_stops: true
+      important: true
+    points:
+    - - 183
+      - 305
+    - - 126
+      - 362
+    - - 240
+      - 362
+  red_loading_zone:
+    label: red loading zone
+    type: polygon
+    role: collect
+    alliance: red
+    visual:
+      color: collect
+      opacity: 0.18
+      border: true
+      label: true
+    analysis:
+      count_time: true
+      detect_stops: true
+      important: true
+    points:
+    - - 2
+      - 308
+    - - 59
+      - 308
+    - - 58
+      - 362
+    - - 0
+      - 362
+  blue_loading_zone:
+    label: blue loading zone
+    type: polygon
+    role: collect
+    alliance: blue
+    visual:
+      color: collect
+      opacity: 0.18
+      border: true
+      label: true
+    analysis:
+      count_time: true
+      detect_stops: true
+      important: true
+    points:
+    - - 307
+      - 308
+    - - 364
+      - 309
+    - - 364
+      - 361
+    - - 308
+      - 361
+  red_base:
+    label: red base
+    type: polygon
+    role: base
+    alliance: red
+    visual:
+      color: base
+      opacity: 0.18
+      border: true
+      label: true
+    analysis:
+      count_time: true
+      detect_stops: true
+      important: true
+    points:
+    - - 76
+      - 259
+    - - 119
+      - 260
+    - - 120
+      - 304
+    - - 76
+      - 303

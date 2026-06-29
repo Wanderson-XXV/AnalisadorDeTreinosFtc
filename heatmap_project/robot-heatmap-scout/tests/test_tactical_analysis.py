@@ -6,7 +6,7 @@ import tempfile
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "src"))
 
-from robot_heatmap.field_config import save_yaml
+from robot_heatmap.field_config import FieldConfig, save_yaml
 from robot_heatmap.tactical_analysis import build_analysis, build_analysis_from_dir
 from robot_heatmap.zones import (
     DEFAULT_ZONE_ANALYSIS,
@@ -246,3 +246,16 @@ def test_build_analysis_from_dir_writes_expected_contract():
     assert analysis["positions"][0]["zone_id"] == "collect"
     assert analysis["events"][0]["category"] == "tracker"
     assert "total_distance_cm" in analysis["summary"]
+
+
+def test_decode_field_has_manual_semantic_zone_roles():
+    root = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+    field = FieldConfig.from_file(os.path.join(root, "configs", "fields", "decode.yaml"))
+
+    zones = {zone["id"]: zone for zone in normalize_field_zones(field.zones)}
+
+    assert zones["close_zone"]["role"] == "score"
+    assert zones["far_zone"]["role"] == "score"
+    assert zones["red_loading_zone"]["role"] == "collect"
+    assert zones["blue_loading_zone"]["role"] == "collect"
+    assert zones["red_base"]["role"] == "base"
