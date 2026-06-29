@@ -1,8 +1,13 @@
 import os
 import sys
+import csv
+import json
+import tempfile
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "src"))
 
+from robot_heatmap.field_config import save_yaml
+from robot_heatmap.tactical_analysis import build_analysis, build_analysis_from_dir
 from robot_heatmap.zones import (
     DEFAULT_ZONE_ANALYSIS,
     DEFAULT_ZONE_VISUAL,
@@ -177,3 +182,67 @@ def test_build_stops_extracts_relevant_stopped_segments():
     assert stops[0]["zone_id"] == "score"
     assert stops[0]["field_x"] == 12.0
     assert stops[0]["field_y"] == 21.0
+
+
+def test_build_analysis_from_dir_writes_expected_contract():
+    with tempfile.TemporaryDirectory() as tmpdir:
+        field_path = os.path.join(tmpdir, "field.yaml")
+        analysis_dir = os.path.join(tmpdir, "analysis")
+        os.makedirs(analysis_dir)
+        save_yaml(
+            {
+                "field": {
+                    "id": "test",
+                    "name": "Test",
+                    "image": "arena.png",
+                    "unit": "cm",
+                    "width": 100,
+                    "height": 100,
+                },
+                "reference_points": {},
+                "zones": {
+                    "collect": {
+                        "label": "Collect",
+                        "role": "collect",
+                        "points": [[0, 0], [30, 0], [30, 30], [0, 30]],
+                    }
+                },
+            },
+            field_path,
+        )
+        with open(os.path.join(analysis_dir, "positions.csv"), "w", encoding="utf-8", newline="") as f:
+            writer = csv.DictWriter(
+                f,
+                fieldnames=["frame", "time_seconds", "video_x", "video_y", "field_x", "field_y", "bbox_x", "bbox_y", "bbox_w", "bbox_h", "tracking_ok"],
+            )
+            writer.writeheader()
+            writer.writerow({"frame": "0", "time_seconds": "0", "video_x": "1", "video_y": "1", "field_x": "5", "field_y": "5", "bbox_x": "0", "bbox_y": "0", "bbox_w": "2", "bbox_h": "2", "tracking_ok": "true"})
+            writer.writerow({"frame": "10", "time_seconds": "1", "video_x": "2", "video_y": "1", "field_x": "6", "field_y": "5", "bbox_x": "1", "bbox_y": "0", "bbox_w": "2", "bbox_h": "2", "tracking_ok": "true"})
+        with open(os.path.join(analysis_dir, "tracker_events.csv"), "w", encoding="utf-8", newline="") as f:
+            f.write("event,frame,time_seconds,detail\nroi_selected,0,0,initial\n")
+        with open(os.path.join(analysis_dir, "tracker_metrics.json"), "w", encoding="utf-8") as f:
+            json.dump(
+                {
+                    "analysis_name": "analysis",
+                    "video_path": "video.mp4",
+                    "arena_image": "arena.png",
+                    "field_path": field_path,
+                    "duration_seconds": 1.0,
+                    "tracking_ok_percent": 100.0,
+                    "field_width": 100,
+                    "field_height": 100,
+                },
+                f,
+            )
+
+        output_path = build_analysis_from_dir(analysis_dir)
+        analysis = json.load(open(output_path, "r", encoding="utf-8"))
+
+    assert output_path.endswith("analysis.json")
+    assert analysis["metadata"]["analysis_name"] == "analysis"
+    assert analysis["field"]["width"] == 100.0
+    assert analysis["field"]["units"] == "cm"
+    assert analysis["zones"][0]["id"] == "collect"
+    assert analysis["positions"][0]["zone_id"] == "collect"
+    assert analysis["events"][0]["category"] == "tracker"
+    assert "total_distance_cm" in analysis["summary"]

@@ -1,5 +1,10 @@
+import json
 import math
+import os
 
+from robot_heatmap.field_config import FieldConfig
+from robot_heatmap.tracking import read_position_records_csv, read_tracker_events_csv
+from robot_heatmap.zones import normalize_field_zones
 from robot_heatmap.zones import point_in_polygon
 
 
@@ -136,6 +141,134 @@ def build_stops(segments: list[dict], positions: list[dict]) -> list[dict]:
             }
         )
     return stops
+
+
+def build_analysis_from_dir(
+    analysis_dir: str,
+    output_path: str | None = None,
+    field_path: str | None = None,
+) -> str:
+    positions_path = os.path.join(analysis_dir, "positions.csv")
+    events_path = os.path.join(analysis_dir, "tracker_events.csv")
+    metrics_path = os.path.join(analysis_dir, "tracker_metrics.json")
+
+    raw_positions = read_position_records_csv(positions_path)
+    raw_events = read_tracker_events_csv(events_path)
+    with open(metrics_path, "r", encoding="utf-8") as f:
+        metrics = json.load(f)
+
+    resolved_field_path = field_path or metrics.get("field_path")
+    if not resolved_field_path:
+        raise ValueError("field_path ausente em tracker_metrics.json; passe --field.")
+    if not os.path.isabs(resolved_field_path):
+        resolved_field_path = os.path.normpath(os.path.join(analysis_dir, resolved_field_path))
+
+    field_config = FieldConfig.from_file(resolved_field_path)
+    analysis = build_analysis(
+        analysis_dir=analysis_dir,
+        raw_positions=raw_positions,
+        raw_events=raw_events,
+        metrics=metrics,
+        field_config=field_config,
+        field_path=resolved_field_path,
+    )
+    output_path = output_path or os.path.join(analysis_dir, "analysis.json")
+    with open(output_path, "w", encoding="utf-8") as f:
+        json.dump(analysis, f, ensure_ascii=False, indent=2)
+    return output_path
+
+
+def build_analysis(
+    analysis_dir: str,
+    raw_positions: list[dict],
+    raw_events: list[dict],
+    metrics: dict,
+    field_config: FieldConfig,
+    field_path: str,
+) -> dict:
+    zones = normalize_field_zones(field_config.zones)
+    positions = build_position_analysis(raw_positions, zones)
+    segments = build_segments(positions)
+    stops = build_stops(segments, positions)
+    events = build_events(raw_events, stops)
+    summary = build_summary(positions, stops)
+    field = field_config.field
+    return {
+        "metadata": {
+            "analysis_name": metrics.get("analysis_name", os.path.basename(os.path.normpath(analysis_dir))),
+            "video_path": metrics.get("video_path", ""),
+            "field_path": metrics.get("field_path", field_path),
+            "arena_image": metrics.get("arena_image", field.get("image", "")),
+            "duration_seconds": float(metrics.get("duration_seconds", 0.0)),
+            "tracking_ok_percent": float(metrics.get("tracking_ok_percent", 0.0)),
+            "roi_reselections": int(metrics.get("roi_reselections", 0)),
+            "tracking_lost_count": int(metrics.get("tracking_lost_count", 0)),
+            "longest_segment_without_reselect_seconds": float(
+                metrics.get("longest_segment_without_reselect_seconds", 0.0)
+            ),
+        },
+        "field": {
+            "width": float(field.get("width", metrics.get("field_width", 1000))),
+            "height": float(field.get("height", metrics.get("field_height", 1000))),
+            "units": field.get("unit", field.get("units", "normalized")),
+            "image": metrics.get("arena_image", field.get("image", "")),
+        },
+        "zones": zones,
+        "positions": positions,
+        "segments": segments,
+        "stops": stops,
+        "events": events,
+        "summary": summary,
+    }
+
+
+def build_events(raw_events: list[dict], stops: list[dict]) -> list[dict]:
+    events = [
+        {
+            "time": _csv_float(event.get("time_seconds"), 0.0),
+            "type": event.get("event", ""),
+            "category": "tracker",
+            "label": event.get("event", "").replace("_", " "),
+            "detail": event.get("detail", ""),
+        }
+        for event in raw_events
+    ]
+    for stop in stops:
+        events.append(
+            {
+                "time": stop["start"],
+                "type": "stop_started",
+                "category": "analysis",
+                "label": f"Stop started near {stop.get('zone_id') or 'unmarked zone'}",
+                "stop_id": stop["id"],
+            }
+        )
+    return sorted(events, key=lambda event: event["time"])
+
+
+def build_summary(positions: list[dict], stops: list[dict]) -> dict:
+    total_distance = 0.0
+    previous = None
+    time_by_zone_role = {}
+    for position in positions:
+        role = position.get("zone_role", "unknown")
+        time_by_zone_role.setdefault(role, 0.0)
+        if previous and position.get("tracking_ok") and previous.get("tracking_ok"):
+            if position.get("field_x") is not None and previous.get("field_x") is not None:
+                total_distance += math.dist(
+                    [position["field_x"], position["field_y"]],
+                    [previous["field_x"], previous["field_y"]],
+                )
+                dt = max(0.0, position["t"] - previous["t"])
+                time_by_zone_role[role] += dt
+        previous = position
+    return {
+        "total_distance_cm": round(total_distance, 3),
+        "total_stopped_time": round(sum(stop["duration"] for stop in stops), 3),
+        "time_by_zone_role": {
+            role: round(value, 3) for role, value in time_by_zone_role.items()
+        },
+    }
 
 
 def _csv_bool(value: object) -> bool:
