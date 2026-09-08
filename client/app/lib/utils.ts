@@ -2,6 +2,7 @@
 
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
+import { getCycleTimeInterval } from "./matchTiming";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -26,10 +27,7 @@ export function formatDate(dateStr: string): string {
 }
 
 export function getTimeInterval(timestamp: number): string {
-  if (timestamp < 30000) return "0-30s";
-  if (timestamp < 60000) return "30-60s";
-  if (timestamp < 90000) return "60-90s";
-  return "90-120s";
+  return getCycleTimeInterval(timestamp);
 }
 
 export function getDateString(date: Date): string {

@@ -76,12 +76,13 @@ try {
             $roundType = $body['roundType'] ?? 'teleop_only';
             $batteryName = $body['batteryName'] ?? null;
             $batteryVolts = isset($body['batteryVolts']) ? (float)$body['batteryVolts'] : null;
+            $transitionDurationMs = normalizeTransitionDurationMs($body['transitionDurationMs'] ?? null);
             
             $stmt = $db->prepare("
-                INSERT INTO rounds (id, start_time, round_type, battery_name, battery_volts) 
-                VALUES (?, ?, ?, ?, ?)
+                INSERT INTO rounds (id, start_time, round_type, battery_name, battery_volts, transition_duration_ms) 
+                VALUES (?, ?, ?, ?, ?, ?)
             ");
-            $stmt->execute([$id, $startTime, $roundType, $batteryName, $batteryVolts]);
+            $stmt->execute([$id, $startTime, $roundType, $batteryName, $batteryVolts, $transitionDurationMs]);
             
             jsonResponse([
                 'id' => $id,
@@ -89,6 +90,7 @@ try {
                 'roundType' => $roundType,
                 'batteryName' => $batteryName,
                 'batteryVolts' => $batteryVolts,
+                'transitionDurationMs' => $transitionDurationMs,
                 'cycles' => []
             ], 201);
             break;
@@ -117,6 +119,10 @@ try {
             if (isset($body['strategy'])) {
                 $updates[] = 'strategy = ?';
                 $params[] = $body['strategy'];
+            }
+            if (array_key_exists('transitionDurationMs', $body)) {
+                $updates[] = 'transition_duration_ms = ?';
+                $params[] = normalizeTransitionDurationMs($body['transitionDurationMs']);
             }
             
             $updates[] = 'updated_at = ?';

@@ -11,7 +11,7 @@ export default function HistoryPage() {
     <div className="min-h-screen flex">
       <Sidebar />
       <main className={cn(
-        'flex-1 p-8 pt-20 lg:pt-8 transition-all duration-300',
+        'min-w-0 flex-1 p-8 pt-20 lg:pt-8 transition-all duration-300',
         isCollapsed ? 'lg:ml-20' : 'lg:ml-64'
       )}>
         <div className="max-w-6xl mx-auto">

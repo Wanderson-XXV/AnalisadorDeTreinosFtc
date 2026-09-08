@@ -1,0 +1,18 @@
+Options -MultiViews
+
+<IfModule mod_headers.c>
+  # Sempre busca o HTML mais recente. Os arquivos CSS e JS do Vite têm hash
+  # no nome, então um novo deploy já referencia automaticamente as versões novas.
+  <Files "index.html">
+    Header always set Cache-Control "no-store, no-cache, must-revalidate, max-age=0"
+    Header always set Pragma "no-cache"
+    Header always set Expires "0"
+  </Files>
+</IfModule>
+
+RewriteEngine On
+RewriteBase /techfenixscoutapp/
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^ index.html [L]

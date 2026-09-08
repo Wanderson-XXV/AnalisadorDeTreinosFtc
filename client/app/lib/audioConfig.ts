@@ -1,61 +1,25 @@
 import { BASE_PATH } from '../config';
+import {
+  DEFAULT_TRANSITION_DURATION_MS,
+  getAudioEventsForRound as buildAudioEventsForRound,
+} from './matchTiming';
+import type { MatchTimingInput, TimingRoundType } from './matchTiming';
 
 export interface AudioEvent {
   timestamp: number;
   file: string;
-  modes: ('teleop_only' | 'full_match')[];
+  modes: TimingRoundType[];
   description?: string;
 }
 
-const s = (seconds: number) => seconds * 1000;
+export function getAudioEventsForRound(
+  roundType: TimingRoundType,
+  timing: MatchTimingInput = { transitionDurationMs: DEFAULT_TRANSITION_DURATION_MS },
+): AudioEvent[] {
+  return buildAudioEventsForRound(roundType, timing, BASE_PATH);
+}
 
 export const AUDIO_EVENTS: AudioEvent[] = [
-  {
-    timestamp: s(29),
-    file: `${BASE_PATH}/sounds/fim_autonomo.mpeg`,
-    modes: ['full_match'],
-    description: 'PickControllers'
-  },
-  {
-    timestamp: s(33.5),
-    file: `${BASE_PATH}/sounds/inicio_teleop.mpeg`,
-    modes: ['full_match'],
-    description: 'inicio teleop'
-  },
-  {
-    timestamp: s(135),
-    file: `${BASE_PATH}/sounds/endgame.mpeg`,
-    modes: ['full_match'],
-    description: 'endgame'
-  },
-  {
-    timestamp: s(97),
-    file: `${BASE_PATH}/sounds/endgame.mpeg`,
-    modes: ['teleop_only'],
-    description: 'endgame'
-  },
-  {
-    timestamp: s(147),
-    file: `${BASE_PATH}/sounds/10secsClashRoyale.mp3`,
-    modes: ['full_match'],
-    description: '10s'
-  },
-  {
-    timestamp: s(109),
-    file: `${BASE_PATH}/sounds/10secsClashRoyale.mp3`,
-    modes: ['teleop_only'],
-    description: '10s'
-  },
-  {
-    timestamp: s(154),
-    file: `${BASE_PATH}/sounds/fim_round.mpeg`,
-    modes: ['full_match'],
-    description: 'Fim da partida completa'
-  },
-  {
-    timestamp: s(115),
-    file: `${BASE_PATH}/sounds/fim_round.mpeg`,
-    modes: ['teleop_only'],
-    description: 'Fim do teleop only'
-  }
+  ...getAudioEventsForRound('full_match'),
+  ...getAudioEventsForRound('teleop_only'),
 ];

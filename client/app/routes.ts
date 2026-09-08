@@ -1,18 +1,17 @@
-// React Router v7 - Definição de rotas
-// Adapte conforme a estrutura do seu projeto
-
 import { type RouteConfig, index, route } from "@react-router/dev/routes";
 
 export default [
-  // Página principal - Timer
   index("routes/home.tsx"),
-  
-  // Dashboard - Estatísticas e gráficos
   route("dashboard", "routes/dashboard.tsx"),
-  
-  // Histórico - Lista de rounds anteriores
   route("history", "routes/history.tsx"),
-  
-  // Campeonatos - Em breve
+  route("teams", "routes/teams.tsx"),
+  route("championship-management", "routes/championship-management.tsx"),
   route("championships", "routes/championships.tsx"),
+  route("scout-management", "routes/scout-management.tsx"),
+  route("users", "routes/users.tsx"),
+  route("scouting/:id", "routes/scouting.tsx"),
+  route("team/:teamNumber", "routes/team-profile.tsx"),
+  route("analysis", "routes/analysis.tsx"),
+  route("settings", "routes/settings.tsx"),
+  route("match-analysis/:matchId", "routes/match-analysis.tsx"),
 ] satisfies RouteConfig;

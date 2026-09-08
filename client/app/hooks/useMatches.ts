@@ -3,8 +3,10 @@ import type
 
  { Match } from '../lib/types';
 import { fetchApi } from '../lib/api';
+import { useChampionshipContext } from './useChampionshipContext';
 
 export function useMatches() {
+  const { queryString } = useChampionshipContext();
   const [matches, setMatches] = useState<Match[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -13,14 +15,14 @@ export function useMatches() {
     setLoading(true);
     setError(null);
     try {
-      const data = await fetchApi<Match[]>('/matches.php');
+      const data = await fetchApi<Match[]>(`/matches.php${queryString ? `?${queryString}` : ''}`);
       setMatches(data);
     } catch (e: any) {
       setError(e.message);
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [queryString]);
 
   useEffect(() => { load(); }, [load]);
 

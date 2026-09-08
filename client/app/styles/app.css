@@ -16,6 +16,29 @@ body {
   @apply bg-slate-900 text-slate-100 antialiased;
 }
 
+/* Controles acionáveis devem sempre comunicar que podem ser clicados. */
+button:not(:disabled),
+a[href],
+[role="button"]:not([aria-disabled="true"]),
+summary,
+select,
+input[type="checkbox"],
+input[type="radio"] {
+  cursor: pointer;
+}
+
+/* O card antecipa sua ação principal, exceto quando o cursor já está sobre uma ação mais específica. */
+.match-card:hover:not(:has(.team-row-action:hover)):not(:has(.video-analysis-action:hover)):not(:has(.match-details-action:hover)) .match-details-action {
+  border-color: rgb(56 189 248 / 0.7);
+  background-color: rgb(14 165 233 / 0.15);
+  color: rgb(224 242 254);
+  box-shadow: 0 4px 10px rgb(14 165 233 / 0.15);
+}
+
+.match-card:hover:not(:has(.team-row-action:hover)):not(:has(.video-analysis-action:hover)):not(:has(.match-details-action:hover)) .match-details-action svg {
+  transform: scale(1.1);
+}
+
 /* Gradiente FTC */
 .ftc-gradient {
   @apply bg-gradient-to-r from-orange-500 to-blue-500;

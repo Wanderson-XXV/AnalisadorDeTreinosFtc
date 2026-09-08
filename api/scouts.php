@@ -1,18 +1,8 @@
 <?php
-/**
- * API de Scouts
- * POST  /scouts.php              - Criar ou logar scout (upsert por username)
- * GET   /scouts.php              - Lista todos os scouts
- * GET   /scouts.php?username=X   - Busca scout por username
- * GET   /scouts.php?id=X         - Busca scout por ID
- * PATCH /scouts.php?id=X         - Atualiza scout
- */
-
 require_once 'config.php';
 
 $method = $_SERVER['REQUEST_METHOD'];
 $id = $_GET['id'] ?? null;
-$username = $_GET['username'] ?? null;
 
 try {
     $db = getDB();
@@ -20,93 +10,101 @@ try {
     switch ($method) {
         case 'GET':
             if ($id) {
-                $stmt = $db->prepare("SELECT * FROM scouts WHERE id = ?");
+                requireScoutSession($db, $id);
+                $stmt = $db->prepare("SELECT id, username, photo_path, transition_duration_ms, keyboard_shortcuts_json, password_hash, created_at, last_active FROM scouts WHERE id = ?");
                 $stmt->execute([$id]);
                 $scout = $stmt->fetch();
-                if (!$scout) jsonError('Scout não encontrado', 404);
-                jsonResponse($scout);
-            } elseif ($username) {
-                $stmt = $db->prepare("SELECT * FROM scouts WHERE username = ?");
-                $stmt->execute([$username]);
-                $scout = $stmt->fetch();
-                if (!$scout) jsonError('Scout não encontrado', 404);
-                jsonResponse($scout);
+                if (!$scout) jsonError('Usuario nao encontrado', 404);
+                jsonResponse(normalizeScoutRow($scout));
             } else {
-                $stmt = $db->prepare("SELECT * FROM scouts ORDER BY username ASC");
-                $stmt->execute();
-                jsonResponse($stmt->fetchAll());
+                $stmt = $db->query("SELECT id, username, photo_path, transition_duration_ms, keyboard_shortcuts_json, password_hash, created_at, last_active FROM scouts ORDER BY username ASC");
+                jsonResponse(array_map('normalizeScoutRow', $stmt->fetchAll()));
             }
             break;
 
         case 'POST':
             $body = getRequestBody();
-
-            if (empty($body['username'])) {
-                jsonError('username é obrigatório', 400);
-            }
+            if (empty($body['username'])) jsonError('username obrigatorio', 400);
 
             $username = trim($body['username']);
 
-            // Upsert: se já existe, atualiza last_active e retorna
-            $stmt = $db->prepare("SELECT * FROM scouts WHERE username = ?");
+            $stmt = $db->prepare("SELECT id, username, photo_path, transition_duration_ms, keyboard_shortcuts_json, password_hash, created_at, last_active FROM scouts WHERE username = ?");
             $stmt->execute([$username]);
-            $existing = $stmt->fetch();
+            $scout = $stmt->fetch();
 
-            if ($existing) {
-                $stmt = $db->prepare("UPDATE scouts SET last_active = ? WHERE id = ?");
-                $stmt->execute([date('c'), $existing['id']]);
-                $existing['last_active'] = date('c');
-                jsonResponse($existing);
+            if (!$scout) jsonError('Usuario nao encontrado. Peca a um administrador para cadastra-lo.', 404);
+
+            // Perfis comuns continuam com entrada rapida. O perfil que tiver senha
+            // configurada precisa confirma-la antes de abrir a conta.
+            if (!empty($scout['password_hash'])) {
+                $password = (string)($body['password'] ?? '');
+                if ($password === '' || !password_verify($password, $scout['password_hash'])) {
+                    jsonError('Senha incorreta.', 401);
+                }
             }
 
-            // Cria novo scout
-            $newId = generateId();
-            $stmt = $db->prepare("
-                INSERT INTO scouts (id, username, photo_path, last_active)
-                VALUES (?, ?, ?, ?)
-            ");
-            $stmt->execute([
-                $newId,
-                $username,
-                $body['photo_path'] ?? null,
-                date('c'),
-            ]);
+            $now = date('c');
+            $db->prepare("UPDATE scouts SET last_active = ? WHERE id = ?")->execute([$now, $scout['id']]);
+            $scout['last_active'] = $now;
 
-            $stmt = $db->prepare("SELECT * FROM scouts WHERE id = ?");
-            $stmt->execute([$newId]);
-            jsonResponse($stmt->fetch(), 201);
+            jsonResponse(array_merge(normalizeScoutRow($scout), ['session_token' => createScoutSession($db, $scout['id'])]));
             break;
 
         case 'PATCH':
-            if (!$id) jsonError('id é obrigatório', 400);
-
+            if (!$id) jsonError('id obrigatorio', 400);
+            requireScoutSession($db, $id);
             $body = getRequestBody();
+
             $fields = [];
             $params = [];
 
-            foreach (['photo_path'] as $field) {
-                if (array_key_exists($field, $body)) {
-                    $fields[] = "$field = ?";
-                    $params[] = $body[$field];
+            if (array_key_exists('transition_duration_ms', $body)) {
+                $fields[] = 'transition_duration_ms = ?';
+                $params[] = normalizeTransitionDurationMs($body['transition_duration_ms']);
+            }
+            if (array_key_exists('keyboard_shortcuts', $body)) {
+                $fields[] = 'keyboard_shortcuts_json = ?';
+                $params[] = json_encode(normalizeKeyboardShortcuts($body['keyboard_shortcuts']));
+            }
+            if (array_key_exists('new_password', $body)) {
+                $newPassword = (string)$body['new_password'];
+                if (strlen($newPassword) < 8) jsonError('A senha deve ter pelo menos 8 caracteres.', 400);
+                $currentPassword = (string)($body['current_password'] ?? '');
+                $passwordLookup = $db->prepare("SELECT password_hash FROM scouts WHERE id = ?");
+                $passwordLookup->execute([$id]);
+                $stored = $passwordLookup->fetch();
+                if (!$stored) jsonError('Usuario nao encontrado', 404);
+                if (!empty($stored['password_hash']) && !password_verify($currentPassword, $stored['password_hash'])) {
+                    jsonError('A senha atual esta incorreta.', 401);
                 }
+                $fields[] = 'password_hash = ?';
+                $params[] = password_hash($newPassword, PASSWORD_DEFAULT);
             }
 
             if (empty($fields)) jsonError('Nenhum campo para atualizar', 400);
 
+            $fields[] = 'last_active = ?';
+            $params[] = date('c');
             $params[] = $id;
+
             $stmt = $db->prepare("UPDATE scouts SET " . implode(', ', $fields) . " WHERE id = ?");
             $stmt->execute($params);
+            if ($stmt->rowCount() === 0) jsonError('Usuario nao encontrado', 404);
 
-            $stmt = $db->prepare("SELECT * FROM scouts WHERE id = ?");
+            if (array_key_exists('new_password', $body)) {
+                $db->prepare("DELETE FROM scout_sessions WHERE scout_id = ?")->execute([$id]);
+            }
+
+            $stmt = $db->prepare("SELECT id, username, photo_path, transition_duration_ms, keyboard_shortcuts_json, password_hash, created_at, last_active FROM scouts WHERE id = ?");
             $stmt->execute([$id]);
-            $scout = $stmt->fetch();
-            if (!$scout) jsonError('Scout não encontrado', 404);
-            jsonResponse($scout);
+            jsonResponse(normalizeScoutRow($stmt->fetch()));
             break;
 
         default:
-            jsonError('Método não permitido', 405);
+            jsonError('Metodo nao permitido', 405);
     }
+} catch (InvalidArgumentException $e) {
+    jsonError($e->getMessage(), 400);
 } catch (Exception $e) {
     jsonError($e->getMessage());
 }

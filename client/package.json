@@ -6,6 +6,8 @@
     "build": "react-router build",
     "dev": "react-router dev",
     "start": "react-router-serve ./build/server/index.js",
+    "test:timing": "node --test --experimental-strip-types app/lib/matchTiming.test.ts",
+    "test:cri": "node --test --experimental-strip-types app/lib/matchTeams.test.ts app/lib/keyboardShortcuts.test.ts app/lib/matchSchedule.test.ts",
     "typecheck": "react-router typegen && tsc"
   },
   "dependencies": {

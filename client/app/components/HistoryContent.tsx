@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Clock, ChevronDown, ChevronUp, Trash2, Calendar, Check, X, Battery } from 'lucide-react';
 import type { RoundData } from '../lib/types';
+import { buildRoundHistoryStats } from '../lib/historyStats';
 import { cn, formatTime, formatDate } from '../lib/utils';
 import { API_BASE } from '../lib/api';
 
@@ -24,6 +25,7 @@ export function HistoryContent() {
       endTime: round.end_time,
       observations: round.observations,
       totalDuration: round.total_duration,
+      transitionDurationMs: round.transition_duration_ms,
       roundType: round.round_type || 'teleop_only',
       batteryName: round.battery_name,
       batteryVolts: round.battery_volts,
@@ -38,7 +40,8 @@ export function HistoryContent() {
         timestamp: cycle.timestamp,
         timeInterval: cycle.time_interval,
         zone: cycle.zone,
-        isAutonomous: cycle.is_autonomous === 1
+        isAutonomous: cycle.is_autonomous === 1,
+        notes: cycle.notes,
       }))
     }));
     
@@ -71,20 +74,6 @@ export function HistoryContent() {
     const mins = Math.floor(secs / 60);
     const remainingSecs = secs % 60;
     return `${mins}:${String(remainingSecs).padStart(2, '0')}`;
-  };
-
-  const getRoundStats = (round: RoundData) => {
-    const cycles = round?.cycles ?? [];
-    const totalCycles = cycles.length;
-    const avgTime = totalCycles > 0
-      ? cycles.reduce((sum, c) => sum + (c?.duration ?? 0), 0) / totalCycles
-      : 0;
-    const hits = cycles.reduce((sum, c) => sum + (c?.hits ?? 0), 0);
-    const misses = cycles.reduce((sum, c) => sum + (c?.misses ?? 0), 0);
-    const nearCycles = cycles.filter(c => c.zone === 'near').length;
-    const farCycles = cycles.filter(c => c.zone === 'far').length;
-    const autoCycles = cycles.filter(c => c.isAutonomous).length;
-    return { totalCycles, avgTime, hits, misses, nearCycles, farCycles, autoCycles };
   };
 
   if (loading) {
@@ -123,19 +112,19 @@ export function HistoryContent() {
       ) : (
         <div className="space-y-4">
           {rounds.map((round) => {
-            const stats = getRoundStats(round);
+            const stats = buildRoundHistoryStats(round);
             const isExpanded = expandedRound === round.id;
 
             return (
               <div
                 key={round.id}
-                className="bg-slate-800/50 border border-slate-700 rounded-xl overflow-hidden"
+                className="min-w-0 overflow-hidden rounded-xl border border-slate-700 bg-slate-800/50"
               >
                 <div
-                  className="flex items-center justify-between p-4 cursor-pointer hover:bg-slate-700/30"
+                  className="flex flex-col gap-3 p-4 cursor-pointer hover:bg-slate-700/30 sm:flex-row sm:items-center sm:justify-between"
                   onClick={() => setExpandedRound(isExpanded ? null : round.id)}
                 >
-                  <div className="flex items-center gap-4">
+                  <div className="flex min-w-0 items-center gap-4">
                     <div>
                       <div className="flex items-center gap-2 mb-1">
                         <p className="text-white font-medium">
@@ -184,8 +173,8 @@ export function HistoryContent() {
                       </div>
                     </div>
                   </div>
-                    <div className="flex items-center gap-6">
-                      <div className="flex items-center gap-4 text-sm">
+                    <div className="flex flex-wrap items-center gap-3 sm:gap-6">
+                      <div className="flex flex-wrap items-center gap-3 text-sm sm:gap-4">
                         <span className="text-slate-400">
                           <span className="text-white font-bold">{stats.totalCycles}</span> ciclos
                         </span>
@@ -244,16 +233,43 @@ export function HistoryContent() {
                       </div>
                     )}
 
-                    <div>
-                      <table className="w-full">
+                    {round.roundType === 'full_match' && (
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                        {[
+                          { label: 'Autônomo', stats: stats.periodStats.auto, color: 'text-yellow-400' },
+                          { label: 'Teleoperado', stats: stats.periodStats.teleop, color: 'text-blue-400' },
+                        ].map((period) => (
+                          <div
+                            key={period.label}
+                            className="bg-slate-700/30 rounded-lg p-3"
+                          >
+                            <p className="text-xs text-slate-400">{period.label}</p>
+                            <div className="mt-2 grid grid-cols-2 gap-2 text-center">
+                              <div>
+                                <p className={cn("text-lg font-bold", period.color)}>{period.stats.hits}</p>
+                                <p className="text-[11px] text-slate-500">Acertos</p>
+                              </div>
+                              <div>
+                                <p className="text-lg font-bold text-red-400">{period.stats.misses}</p>
+                                <p className="text-[11px] text-slate-500">Erros</p>
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+
+                    <div className="w-full max-w-full overflow-x-auto">
+                      <table className="w-full sm:min-w-[720px]">
                         <thead>
                           <tr className="border-b border-slate-600">
                             <th className="text-left py-2 px-3 text-xs text-slate-400">#</th>
                             <th className="text-left py-2 px-3 text-xs text-slate-400">Tempo</th>
                             <th className="text-left py-2 px-3 text-xs text-slate-400">Intervalo</th>
-                            <th className="text-left py-2 px-3 text-xs text-slate-400">Zona</th>  {/* NOVA COLUNA */}
+                            <th className="text-left py-2 px-3 text-xs text-slate-400">Zona</th>
                             <th className="text-center py-2 px-3 text-xs text-slate-400">Acertos</th>
                             <th className="text-center py-2 px-3 text-xs text-slate-400">Erros</th>
+                            <th className="text-left py-2 px-3 text-xs text-slate-400">Nota</th>
                             <th className="text-right py-2 px-3 text-xs text-slate-400">Timestamp</th>
                           </tr>
                         </thead>
@@ -282,13 +298,14 @@ export function HistoryContent() {
                                   {cycle.timeInterval}
                                 </span>
                               </td>
-                              <td className="py-2 px-3">  {/* NOVA COLUNA */}
+                              <td className="py-2 px-3">
                                 {cycle.zone === 'near' && <span className="text-green-400 text-xs">🎯 Perto</span>}
                                 {cycle.zone === 'far' && <span className="text-blue-400 text-xs">🚀 Longe</span>}
                                 {!cycle.zone && <span className="text-slate-500 text-xs">-</span>}
                               </td>
                               <td className="py-2 px-3 text-center text-green-400">{cycle.hits}</td>
                               <td className="py-2 px-3 text-center text-red-400">{cycle.misses}</td>
+                              <td className="py-2 px-3 text-sm text-slate-300 whitespace-pre-wrap break-words">{cycle.notes || <span className="text-slate-600">—</span>}</td>
                               <td className="py-2 px-3 text-right text-slate-500 text-sm">
                                 {formatTime(cycle.timestamp)}
                               </td>
@@ -298,18 +315,19 @@ export function HistoryContent() {
                       </table>
                     </div>
 
-                    <div className="grid grid-cols-4 gap-2">
-                      {['0-30s', '30-60s', '60-90s', '90-120s'].map((interval) => {
-                        const intervalCycles = (round.cycles ?? []).filter(
-                          (c) => c.timeInterval === interval
-                        );
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+                      {stats.intervalStats.map((interval) => {
                         return (
                           <div
-                            key={interval}
+                            key={interval.interval}
                             className="bg-slate-700/30 rounded-lg p-2 text-center"
                           >
-                            <p className="text-xs text-slate-400">{interval}</p>
-                            <p className="text-lg font-bold text-white">{intervalCycles.length}</p>
+                            <p className="text-xs text-slate-400">{interval.interval}</p>
+                            <p className="text-lg font-bold text-white">{interval.cycles}</p>
+                            <div className="mt-1 flex items-center justify-center gap-2 text-xs">
+                              <span className="text-green-400">{interval.hits} acertos</span>
+                              <span className="text-red-400">{interval.misses} erros</span>
+                            </div>
                           </div>
                         );
                       })}

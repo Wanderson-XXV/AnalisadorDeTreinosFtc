@@ -25,20 +25,22 @@ try {
             $misses = $body['misses'] ?? 0;
             $timestamp = $body['timestamp'] ?? 0;
             $zone = $body['zone'] ?? null;
+            $notes = trim((string)($body['notes'] ?? '')) ?: null;
             $isFullMatch = $body['isFullMatch'] ?? false;
+            $transitionDurationMs = normalizeTransitionDurationMs($body['transitionDurationMs'] ?? null);
             
             if (!$roundId) {
                 jsonError('roundId é obrigatório', 400);
             }
             
-            $timeInterval = getTimeInterval($timestamp, $isFullMatch);
+            $timeInterval = getTimeInterval($timestamp, $isFullMatch, $transitionDurationMs);
             $isAutonomous = ($isFullMatch && $timestamp < 30000) ? 1 : 0;
             
             $stmt = $db->prepare("
-                INSERT INTO cycles (id, round_id, cycle_number, duration, hits, misses, timestamp, time_interval, zone, is_autonomous)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                INSERT INTO cycles (id, round_id, cycle_number, duration, hits, misses, timestamp, time_interval, zone, is_autonomous, notes)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             ");
-            $stmt->execute([$id, $roundId, $cycleNumber, $duration, $hits, $misses, $timestamp, $timeInterval, $zone, $isAutonomous]);
+            $stmt->execute([$id, $roundId, $cycleNumber, $duration, $hits, $misses, $timestamp, $timeInterval, $zone, $isAutonomous, $notes]);
             
             jsonResponse([
                 'id' => $id,
@@ -50,7 +52,8 @@ try {
                 'timestamp' => $timestamp,
                 'timeInterval' => $timeInterval,
                 'zone' => $zone,
-                'isAutonomous' => $isAutonomous
+                'isAutonomous' => $isAutonomous,
+                'notes' => $notes
             ], 201);
             break;
             
@@ -70,6 +73,14 @@ try {
             if (isset($body['misses'])) {
                 $updates[] = 'misses = ?';
                 $params[] = $body['misses'];
+            }
+            if (array_key_exists('zone', $body)) {
+                $updates[] = 'zone = ?';
+                $params[] = $body['zone'];
+            }
+            if (array_key_exists('notes', $body)) {
+                $updates[] = 'notes = ?';
+                $params[] = trim((string)$body['notes']) ?: null;
             }
             
             if (empty($updates)) {

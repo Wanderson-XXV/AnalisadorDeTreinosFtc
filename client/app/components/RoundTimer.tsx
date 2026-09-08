@@ -1,21 +1,24 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { Play, Square, Flag, RefreshCw, XCircle } from 'lucide-react';
 import { TimerDisplay } from './TimerDisplay';
 import { CycleModal } from './CycleModal';
 import { CycleList } from './CycleList';
+import { TransitionDurationControl } from './TransitionDurationControl';
+import { ZoneSelector } from './ZoneSelector';
 import type { CycleData, CycleZone, RoundType } from '../lib/types';
-import { AUDIO_EVENTS } from '../lib/audioConfig';
+import { getAudioEventsForRound } from '../lib/audioConfig';
 import { 
   BATTERIES, 
   TELEOP_DURATION, 
-  FULL_MATCH_DURATION,
   AUTO_DURATION,
-  TRANSITION_DURATION,
   calculateStrategy 
 } from '../lib/types';
-import { getTimeInterval } from '../lib/utils';
+import { createMatchTiming, getCycleMarkTiming, getCycleTimeInterval, getMatchPhase } from '../lib/matchTiming';
 import { API_BASE } from '../lib/api';
 import { useSoundSettings } from '../hooks/useSoundSettings';
+import { useTransitionDurationSetting } from '../hooks/useTransitionDurationSetting';
+import { useKeyboardShortcuts } from '../hooks/useKeyboardShortcuts';
+import { formatShortcutCode, isTextEntryTarget } from '../lib/keyboardShortcuts';
 type MatchPhase = 'auto' | 'transition' | 'teleop' | 'overtime';
 
 export function RoundTimer() {
@@ -39,11 +42,16 @@ export function RoundTimer() {
   const [roundType, setRoundType] = useState<RoundType>('teleop_only');
   const [batteryName, setBatteryName] = useState<string | null>(null);
   const [batteryVolts, setBatteryVolts] = useState<number | null>(null);
+  const { transitionDurationMs, setTransitionDurationMs } = useTransitionDurationSetting();
+  const timing = useMemo(() => createMatchTiming({ transitionDurationMs }), [transitionDurationMs]);
+  const audioEvents = useMemo(
+    () => getAudioEventsForRound(roundType, timing),
+    [roundType, timing],
+  );
   
-  const roundDuration = roundType === 'full_match' ? FULL_MATCH_DURATION : TELEOP_DURATION;
-  const displayDuration = TELEOP_DURATION;
   const { soundEnabled } = useSoundSettings();
   const [lastSelectedZone, setLastSelectedZone] = useState<CycleZone>('near');
+  const keyboardShortcuts = useKeyboardShortcuts();
   useEffect(() => {
     if (!isRunning && !roundId) {
       setCurrentPhase(roundType === 'full_match' ? 'auto' : 'teleop');
@@ -52,22 +60,15 @@ export function RoundTimer() {
   
 
   const getPhaseFromTime = (time: number): MatchPhase => {
-    if (roundType === 'teleop_only') {
-      return time >= TELEOP_DURATION ? 'overtime' : 'teleop';
-    }
-    
-    if (time < AUTO_DURATION) return 'auto';
-    if (time < AUTO_DURATION + TRANSITION_DURATION) return 'transition';
-    if (time < FULL_MATCH_DURATION) return 'teleop';
-    return 'overtime';
+    return getMatchPhase(time, roundType, timing);
   };
 
 useEffect(() => {
-  AUDIO_EVENTS.forEach(event => {
+  audioEvents.forEach(event => {
     const audio = new Audio(event.file);
     audioCache.current.set(event.file, audio);
   });
-}, []);
+}, [audioEvents]);
 
 useEffect(() => {
   if (!isRunning) {
@@ -85,13 +86,13 @@ useEffect(() => {
       const newPhase = getPhaseFromTime(newElapsed);
       if (newPhase !== currentPhase) {
         setCurrentPhase(newPhase);
-        if (newPhase === 'transition' || (newPhase === 'teleop' && roundType === 'full_match')) {
-          setLastCycleEnd(newElapsed);
+        if (newPhase === 'teleop' && roundType === 'full_match') {
+          setLastCycleEnd(timing.teleopStartMs);
         }
       }
       
       if (soundEnabled) {
-        AUDIO_EVENTS.forEach(event => {
+        audioEvents.forEach(event => {
           if (event.modes.includes(roundType) && !playedTimestamps.current.has(event.timestamp)) {
             const tolerance = 100;
             if (Math.abs(newElapsed - event.timestamp) <= tolerance) {
@@ -110,39 +111,41 @@ useEffect(() => {
   return () => {
     if (intervalRef.current) clearInterval(intervalRef.current);
   };
-}, [isRunning, currentPhase, roundType, soundEnabled]);
+}, [isRunning, currentPhase, roundType, soundEnabled, audioEvents, timing]);
   
 const handleMarkCycle = useCallback(() => {
   if (!isRunning) return;
   const currentTime = elapsedTime ?? 0;
+  const mark = getCycleMarkTiming({
+    currentTimeMs: currentTime,
+    lastCycleEndMs: lastCycleEnd ?? 0,
+    phase: currentPhase,
+    timing,
+  });
   
-  let adjustedTime = currentTime;
-  let adjustedDuration = currentTime - (lastCycleEnd ?? 0);
-  
-  if (currentPhase === 'transition') {
-    adjustedTime = AUTO_DURATION - 1000;
-    adjustedDuration = adjustedTime - (lastCycleEnd ?? 0);
-  }
-  
-  setPendingCycle({ duration: adjustedDuration, timestamp: adjustedTime });
+  setPendingCycle({ duration: mark.duration, timestamp: mark.timestamp });
   setEditingCycle(null);
   setShowModal(true);
-}, [isRunning, elapsedTime, lastCycleEnd, currentPhase]);
+}, [isRunning, elapsedTime, lastCycleEnd, currentPhase, timing]);
 
 // if (isRunning) handleMarkCycle();
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      const isTextareaFocused = document.activeElement === textareaRef.current;
-      
-      if (e.code === 'Space' && !showModal && !isTextareaFocused) {
+      if (isTextEntryTarget(e.target)) return;
+      if (e.code === keyboardShortcuts.toggle_zone) {
+        e.preventDefault();
+        setLastSelectedZone(current => current === 'far' ? 'near' : 'far');
+        return;
+      }
+      if (e.code === keyboardShortcuts.mark_cycle && !showModal) {
         e.preventDefault();
         if (isRunning) handleMarkCycle();
       }
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isRunning, showModal, elapsedTime, lastCycleEnd, currentPhase]);
+  }, [isRunning, showModal, elapsedTime, lastCycleEnd, currentPhase, keyboardShortcuts]);
 
     const handleStart = async () => { 
     try {
@@ -152,6 +155,7 @@ const handleMarkCycle = useCallback(() => {
         body: JSON.stringify({ 
           startTime: new Date().toISOString(),
           roundType,
+          transitionDurationMs,
           batteryName,
           batteryVolts
         }),
@@ -169,18 +173,18 @@ const handleMarkCycle = useCallback(() => {
     }
   };
 
-    const handleCycleSubmit = async (hits: number, misses: number, zone: CycleZone) => {
+    const handleCycleSubmit = async (hits: number, misses: number, zone: CycleZone, notes?: string) => {
       if (!roundId) return;
       
       setLastSelectedZone(zone);
 
       if (editingCycle) {
-        const updatedCycle = { ...editingCycle, hits, misses, zone };
+        const updatedCycle = { ...editingCycle, hits, misses, zone, notes: notes || null };
         try {
           await fetch(`${API_BASE}/cycles.php?id=${editingCycle.id}`, {
             method: 'PATCH',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ hits, misses, zone }),
+            body: JSON.stringify({ hits, misses, zone, notes: notes || null }),
           });
           setCycles(cycles.map(c => c.id === editingCycle.id ? updatedCycle : c));
         } catch (error) {
@@ -202,10 +206,12 @@ const handleMarkCycle = useCallback(() => {
             hits,
             misses,
             timestamp: pendingCycle.timestamp,
-            timeInterval: getTimeInterval(pendingCycle.timestamp),
+            timeInterval: getCycleTimeInterval(pendingCycle.timestamp, roundType, timing),
             zone,
             isAutonomous,
-            isFullMatch: roundType === 'full_match'
+            isFullMatch: roundType === 'full_match',
+            transitionDurationMs,
+            notes: notes || null,
           }),
         });
         const savedCycle = await response.json();
@@ -218,9 +224,10 @@ const handleMarkCycle = useCallback(() => {
           hits,
           misses,
           timestamp: pendingCycle.timestamp,
-          timeInterval: getTimeInterval(pendingCycle.timestamp),
+          timeInterval: getCycleTimeInterval(pendingCycle.timestamp, roundType, timing),
           zone,
           isAutonomous,
+          notes: notes || null,
         };
         
         setCycles([...cycles, newCycle]);
@@ -252,6 +259,7 @@ const handleMarkCycle = useCallback(() => {
           endTime: new Date().toISOString(),
           observations,
           totalDuration: elapsedTime,
+          transitionDurationMs,
           strategy
         }),
       });
@@ -301,7 +309,9 @@ const handleMarkCycle = useCallback(() => {
           totalMs={TELEOP_DURATION}
           roundType={roundType}
           currentPhase={currentPhase}
+          transitionDurationMs={transitionDurationMs}
         />
+        <ZoneSelector zone={lastSelectedZone} onChange={setLastSelectedZone} shortcutCode={keyboardShortcuts.toggle_zone} />
       </div>
 
       <div className="flex flex-wrap justify-center gap-4">
@@ -336,6 +346,14 @@ const handleMarkCycle = useCallback(() => {
                     </button>
                   </div>
                 </div>
+
+                {roundType === 'full_match' && (
+                  <TransitionDurationControl
+                    valueMs={transitionDurationMs}
+                    onChange={setTransitionDurationMs}
+                    disabled={isRunning}
+                  />
+                )}
 
                 <div className="grid grid-cols-2 gap-3">
                   <div>
@@ -384,7 +402,7 @@ const handleMarkCycle = useCallback(() => {
               className="flex items-center gap-2 px-6 sm:px-12 py-4 sm:py-6 rounded-xl bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-400 hover:to-amber-400 text-white font-bold text-lg sm:text-xl transition-all shadow-lg hover:shadow-orange-500/25"
             >
               <Flag className="w-6 h-6 sm:w-7 sm:h-7" />
-              <span className="whitespace-nowrap">Marcar Ciclo (Espaço)</span>
+              <span className="whitespace-nowrap">Marcar Ciclo ({formatShortcutCode(keyboardShortcuts.mark_cycle)})</span>
             </button>
             <button
               onClick={handleFinish}
@@ -495,6 +513,7 @@ const handleMarkCycle = useCallback(() => {
         initialHits={editingCycle?.hits}
         initialMisses={editingCycle?.misses}
         initialZone={editingCycle?.zone ?? lastSelectedZone}
+        onZoneChange={setLastSelectedZone}
         isEditing={!!editingCycle}
         isAutonomous={roundType === 'full_match' && (editingCycle?.isAutonomous ?? ((pendingCycle?.timestamp ?? 0) < AUTO_DURATION))}
       />

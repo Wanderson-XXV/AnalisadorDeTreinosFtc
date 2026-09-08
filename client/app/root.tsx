@@ -8,11 +8,27 @@ import {
 import type { LinksFunction } from "react-router";
 import "./styles/app.css";
 import { SidebarProvider } from "./hooks/useSidebar";
+import { AuthProvider } from './hooks/authContext';
 import { useAuth } from './hooks/useAuth';
 import { LoginForm } from './components/auth/LoginForm';
+import { ChampionshipProvider } from './hooks/championshipContext';
+
+const faviconHref = `${import.meta.env.BASE_URL}tier-logo-favicon.png`;
 
 export const links: LinksFunction = () => [
-  { rel: "icon", href: "/favicon.ico", type: "image/svg+xml" },
+  {
+    rel: "icon",
+    href: faviconHref,
+    type: "image/png",
+    media: "(prefers-color-scheme: light)",
+  },
+  {
+    rel: "icon",
+    href: faviconHref,
+    type: "image/png",
+    media: "(prefers-color-scheme: dark)",
+  },
+  { rel: "icon", href: faviconHref, type: "image/png" },
 ];
 
 export function Layout({ children }: { children: React.ReactNode }) {
@@ -33,7 +49,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
   );
 }
 
-export default function App() {
+function AuthGate() {
   const { scout, loading, login } = useAuth();
 
   if (loading) return null;
@@ -41,8 +57,18 @@ export default function App() {
 
   return (
     <SidebarProvider>
-      <Outlet />
+      <ChampionshipProvider>
+        <Outlet />
+      </ChampionshipProvider>
     </SidebarProvider>
+  );
+}
+
+export default function App() {
+  return (
+    <AuthProvider>
+      <AuthGate />
+    </AuthProvider>
   );
 }
 

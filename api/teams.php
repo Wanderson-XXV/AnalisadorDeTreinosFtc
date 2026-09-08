@@ -10,6 +10,7 @@
  */
 
 require_once 'config.php';
+require_once 'team_profile_lib.php';
 
 $method = $_SERVER['REQUEST_METHOD'];
 $id = $_GET['id'] ?? null;
@@ -20,7 +21,12 @@ try {
 
     switch ($method) {
         case 'GET':
-            if ($id) {
+            if (($_GET['view'] ?? '') === 'directory') {
+                $season = array_key_exists('season', $_GET) ? (string)$_GET['season'] : null;
+                $championshipId = $_GET['championship_id'] ?? null;
+                $hasScout = ($_GET['has_scout'] ?? '0') === '1';
+                jsonResponse(buildTeamDirectory($db, $season, $championshipId, $hasScout));
+            } elseif ($id) {
                 $stmt = $db->prepare("SELECT * FROM teams WHERE id = ?");
                 $stmt->execute([$id]);
                 $team = $stmt->fetch();

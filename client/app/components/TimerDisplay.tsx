@@ -1,6 +1,7 @@
 import { cn } from '../lib/utils';
 import type { RoundType } from '../lib/types';
-import { AUTO_DURATION, TRANSITION_DURATION, TELEOP_DURATION, FULL_MATCH_DURATION } from '../lib/types';
+import { TRANSITION_DURATION } from '../lib/types';
+import { createMatchTiming } from '../lib/matchTiming';
 import { BASE_PATH } from '../config';
 type MatchPhase = 'auto' | 'transition' | 'teleop' | 'overtime';
 
@@ -10,24 +11,25 @@ interface TimerDisplayProps {
   totalMs: number;
   roundType?: RoundType;
   currentPhase?: MatchPhase;
+  transitionDurationMs?: number;
 }
 
-export function TimerDisplay({ timeMs, isRunning, totalMs, roundType, currentPhase = 'teleop' }: TimerDisplayProps) {
+export function TimerDisplay({ timeMs, isRunning, totalMs, roundType, currentPhase = 'teleop', transitionDurationMs = TRANSITION_DURATION }: TimerDisplayProps) {
   const safeTime = timeMs ?? 0;
+  const timing = createMatchTiming({ transitionDurationMs });
   
   let displayTime = 0;
   
   if (roundType === 'full_match') {
     if (currentPhase === 'auto') {
-      displayTime = AUTO_DURATION - safeTime;
+      displayTime = timing.autoDurationMs - safeTime;
     } else if (currentPhase === 'transition') {
-      displayTime = TELEOP_DURATION;
+      displayTime = timing.teleopDurationMs;
     } else if (currentPhase === 'teleop') {
-      const teleopStart = AUTO_DURATION + TRANSITION_DURATION;
-      const teleopElapsed = safeTime - teleopStart;
-      displayTime = TELEOP_DURATION - teleopElapsed;
+      const teleopElapsed = safeTime - timing.teleopStartMs;
+      displayTime = timing.teleopDurationMs - teleopElapsed;
     } else {
-      displayTime = -(safeTime - FULL_MATCH_DURATION);
+      displayTime = -(safeTime - timing.fullMatchDurationMs);
     }
   } else {
     displayTime = totalMs - safeTime;
@@ -42,9 +44,9 @@ export function TimerDisplay({ timeMs, isRunning, totalMs, roundType, currentPha
 
  const progress = roundType === 'full_match' 
   ? currentPhase === 'auto' 
-    ? Math.min((safeTime / AUTO_DURATION) * 100, 100)
+    ? Math.min((safeTime / timing.autoDurationMs) * 100, 100)
     : currentPhase === 'teleop'
-    ? Math.min(((safeTime - AUTO_DURATION - TRANSITION_DURATION) / TELEOP_DURATION) * 100, 100)
+    ? Math.min(((safeTime - timing.teleopStartMs) / timing.teleopDurationMs) * 100, 100)
     : 100
   : Math.min((safeTime / totalMs) * 100, 100);
   const isNearEnd = displayTime < 10000 && displayTime > 0;
@@ -54,7 +56,7 @@ export function TimerDisplay({ timeMs, isRunning, totalMs, roundType, currentPha
     if (currentPhase === 'auto') {
       intervalTime = safeTime;
     } else if (currentPhase === 'teleop') {
-      intervalTime = safeTime - (AUTO_DURATION + TRANSITION_DURATION);
+      intervalTime = safeTime - timing.teleopStartMs;
     }
   } else {
     intervalTime = safeTime;
@@ -115,7 +117,7 @@ const phaseIcons = {
 
       {currentPhase === 'transition' && (
         <div className="text-yellow-400 text-2xl font-bold mb-4">
-          Transição: {Math.ceil((TRANSITION_DURATION - (safeTime - AUTO_DURATION)) / 1000)}s
+          Transição: {Math.ceil((timing.transitionDurationMs - (safeTime - timing.autoDurationMs)) / 1000)}s
         </div>
       )}
 
