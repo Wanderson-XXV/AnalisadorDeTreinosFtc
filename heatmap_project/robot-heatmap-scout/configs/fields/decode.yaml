@@ -127,7 +127,7 @@ zones:
     label: red loading zone
     type: polygon
     role: collect
-    alliance: red
+    alliance: neutral
     visual:
       color: collect
       opacity: 0.18
@@ -150,7 +150,7 @@ zones:
     label: blue loading zone
     type: polygon
     role: collect
-    alliance: blue
+    alliance: neutral
     visual:
       color: collect
       opacity: 0.18

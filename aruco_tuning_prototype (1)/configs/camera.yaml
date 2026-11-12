@@ -1,0 +1,15 @@
+camera:
+  name: Logitech C920
+  source_type: camera
+  index: 0
+  file_path: ''
+  backend: auto
+  width: 1920
+  height: 1080
+  fps: 30
+  autofocus: true
+  focus: 0
+  autoexposure: true
+  exposure: -6
+  gain: 0
+  brightness: 128

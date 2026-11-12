@@ -1,0 +1,31 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "aruco-tuning-prototype"
+version = "0.1.0"
+description = "Real-time LEGO robot tracking and movement tuning with ArUco markers"
+readme = "README.md"
+requires-python = ">=3.9"
+dependencies = [
+    "opencv-python>=4.7.0",
+    "numpy>=1.23,<2.0",
+    "PyYAML>=6.0",
+    "PySide6>=6.5.0",
+    "matplotlib>=3.6.0",
+]
+
+[project.optional-dependencies]
+test = ["pytest>=7.0.0"]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]
+# Domain classes such as TestConfig / TestResult / TestState are data models,
+# not pytest cases. We only use function-style tests, so disable class-based
+# collection to avoid spurious PytestCollectionWarning noise.
+python_classes = []

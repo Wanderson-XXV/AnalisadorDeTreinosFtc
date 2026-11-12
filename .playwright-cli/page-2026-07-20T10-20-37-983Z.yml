@@ -1,0 +1,447 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e814]: "0.75"
+  - generic [ref=e815]:
+    - complementary [ref=e816]:
+      - generic [ref=e817]:
+        - generic [ref=e818]:
+          - generic [ref=e819]:
+            - generic [ref=e820]: A
+            - generic [ref=e821]:
+              - heading "Alícia" [level=1] [ref=e822]
+              - paragraph [ref=e823]: Cycle Tracker
+          - button [ref=e824] [cursor=pointer]
+        - generic [ref=e828]:
+          - generic [ref=e829]: Contexto
+          - combobox [ref=e837] [cursor=pointer]:
+            - option "MPEP · 3 divisoes" [selected]
+            - option "Nacional BR 2026"
+            - option "Romania · 2 divisoes"
+            - option "Texas · 2 divisoes"
+            - option "USILCMP · 1 divisoes"
+            - option "World Championship · 7 divisoes"
+            - option "Chicago Robotics Invitational Premier Event"
+            - option "Illinois Championship"
+            - option "Multinational Tech Invitational"
+          - paragraph [ref=e838]: 3 divisoes/finais disponiveis
+          - paragraph [ref=e839]: FPEMI
+        - navigation [ref=e840]:
+          - paragraph [ref=e841]: Treinos
+          - link "Novo Round" [ref=e842] [cursor=pointer]:
+            - /url: /
+          - link "Dashboard" [ref=e847] [cursor=pointer]:
+            - /url: /dashboard
+          - link "Histórico" [ref=e851] [cursor=pointer]:
+            - /url: /history
+          - link "Configurações" [ref=e857] [cursor=pointer]:
+            - /url: /settings
+          - generic [ref=e862]:
+            - paragraph [ref=e863]: Competições
+            - link "Partidas" [ref=e864] [cursor=pointer]:
+              - /url: /championships
+            - link "Comparar" [ref=e872] [cursor=pointer]:
+              - /url: /analysis
+            - link "Scouts" [ref=e881] [cursor=pointer]:
+              - /url: /scout-management
+            - link "Equipes" [ref=e886] [cursor=pointer]:
+              - /url: /teams
+            - link "Campeonatos" [ref=e893] [cursor=pointer]:
+              - /url: /championship-management
+      - generic [ref=e899]:
+        - button "Sons Ativados" [ref=e900] [cursor=pointer]
+        - generic [ref=e906]:
+          - paragraph [ref=e907]: "Dica: Pressione"
+          - paragraph [ref=e908]: ESPAÇO
+          - paragraph [ref=e909]: para marcar ciclo
+        - button "Trocar usuário" [ref=e910] [cursor=pointer]
+    - main [ref=e915]:
+      - generic [ref=e916]:
+        - generic [ref=e917]:
+          - generic [ref=e918]:
+            - link "Voltar para partidas" [ref=e919] [cursor=pointer]:
+              - /url: /championships
+            - heading "Analise da Partida" [level=1] [ref=e922]
+            - paragraph [ref=e924]: M11 - Edison
+          - generic [ref=e925]:
+            - 'button "Inicio: 00:51.0" [ref=e926] [cursor=pointer]'
+            - generic [ref=e1487]:
+              - generic [ref=e1488]: Inicio do round no video
+              - button "Usar tempo atual (00:00.0)" [ref=e2580] [cursor=pointer]
+              - textbox "-3.5, 37.2 ou 00:37.2" [ref=e1496]: 00:51.0
+              - generic [ref=e1497]:
+                - button "Reset" [ref=e1498] [cursor=pointer]
+                - button "Fechar" [ref=e1502] [cursor=pointer]
+              - button "Salvar ajuste" [ref=e1503] [cursor=pointer]
+              - paragraph [ref=e3138]: O player do YouTube ainda esta carregando. Tente novamente em instantes.
+        - generic [ref=e2581]:
+          - generic [ref=e2582]:
+            - generic [ref=e2583]:
+              - generic [ref=e2584]: Video sincronizado
+              - iframe [ref=e2588]:
+                - generic [ref=f6e1]:
+                  - generic "Player de vídeo do YouTube" [ref=f6e3]
+                  - generic [ref=f6e5]:
+                    - generic:
+                      - generic:
+                        - button "Assistir vídeo" [ref=f6e10] [cursor=pointer]
+                        - button "Ocultar controles do player" [ref=f6e14] [cursor=pointer]
+                        - generic [ref=f6e16]:
+                          - generic [ref=f6e21]:
+                            - generic [ref=f6e22]:
+                              - link "Playoff Match 11 - FIRST Championship - FIRST Tech Challenge - Edison" [ref=f6e23] [cursor=pointer]:
+                                - /url: https://www.youtube.com/watch?v=oQimWMDOBwM
+                              - link "FIRSTRoboticsCompetition" [ref=f6e24] [cursor=pointer]:
+                                - /url: /channel/UCHA7zyPRS3VPDvl4ehss-zw
+                            - generic [ref=f6e26]:
+                              - button [ref=f6e27] [cursor=pointer]:
+                                - img "thumbnail-image" [ref=f6e28]
+                              - generic [ref=f6e30]:
+                                - generic: FIRSTRoboticsCompetition
+                                - generic: 62,1 mil inscritos
+                          - generic [ref=f6e31]:
+                            - button "Compartilhar" [ref=f6e34] [cursor=pointer]
+                            - link "Assistir no YouTube" [ref=f6e45] [cursor=pointer]:
+                              - /url: https://www.youtube.com/watch?v=oQimWMDOBwM
+                              - generic [ref=f6e46]: Assista no
+            - generic [ref=e2589]:
+              - generic [ref=e2590]:
+                - heading "Timeline de ciclos" [level=2] [ref=e2592]
+                - generic [ref=e2593]: "Lento: T21 (14.9s)"
+              - generic [ref=e2594]:
+                - button "A1 00:51.0 00:51.0 - 00:52.2 1.2s" [ref=e2595] [cursor=pointer]:
+                  - generic [ref=e2596]:
+                    - generic [ref=e2597]: A1
+                    - generic [ref=e2598]: 00:51.0
+                  - generic [ref=e2599]: 00:51.0 - 00:52.2
+                  - generic [ref=e2600]: 1.2s
+                - button "A2 00:52.2 00:52.2 - 00:56.3 4.0s" [ref=e2601] [cursor=pointer]:
+                  - generic [ref=e2602]:
+                    - generic [ref=e2603]: A2
+                    - generic [ref=e2604]: 00:52.2
+                  - generic [ref=e2605]: 00:52.2 - 00:56.3
+                  - generic [ref=e2606]: 4.0s
+                - button "A3 00:56.3 00:56.3 - 01:00.6 4.4s" [ref=e2607] [cursor=pointer]:
+                  - generic [ref=e2608]:
+                    - generic [ref=e2609]: A3
+                    - generic [ref=e2610]: 00:56.3
+                  - generic [ref=e2611]: 00:56.3 - 01:00.6
+                  - generic [ref=e2612]: 4.4s
+                - button "A4 01:00.6 01:00.6 - 01:04.5 3.8s" [ref=e2613] [cursor=pointer]:
+                  - generic [ref=e2614]:
+                    - generic [ref=e2615]: A4
+                    - generic [ref=e2616]: 01:00.6
+                  - generic [ref=e2617]: 01:00.6 - 01:04.5
+                  - generic [ref=e2618]: 3.8s
+                - button "A5 01:04.5 01:04.5 - 01:10.4 6.0s" [ref=e2619] [cursor=pointer]:
+                  - generic [ref=e2620]:
+                    - generic [ref=e2621]: A5
+                    - generic [ref=e2622]: 01:04.5
+                  - generic [ref=e2623]: 01:04.5 - 01:10.4
+                  - generic [ref=e2624]: 6.0s
+                - button "A6 01:10.4 01:10.4 - 01:15.9 5.5s" [ref=e2625] [cursor=pointer]:
+                  - generic [ref=e2626]:
+                    - generic [ref=e2627]: A6
+                    - generic [ref=e2628]: 01:10.4
+                  - generic [ref=e2629]: 01:10.4 - 01:15.9
+                  - generic [ref=e2630]: 5.5s
+                - button "A7 01:15.9 01:15.9 - 01:20.0 4.1s" [ref=e2631] [cursor=pointer]:
+                  - generic [ref=e2632]:
+                    - generic [ref=e2633]: A7
+                    - generic [ref=e2634]: 01:15.9
+                  - generic [ref=e2635]: 01:15.9 - 01:20.0
+                  - generic [ref=e2636]: 4.1s
+                - button "T8 01:36.0 01:36.0 - 01:38.3 2.3s rapido" [ref=e2637] [cursor=pointer]:
+                  - generic [ref=e2638]:
+                    - generic [ref=e2639]: T8
+                    - generic [ref=e2640]: 01:36.0
+                  - generic [ref=e2641]: 01:36.0 - 01:38.3
+                  - generic [ref=e2642]:
+                    - text: 2.3s
+                    - generic [ref=e2643]: rapido
+                - button "T9 01:38.3 01:38.3 - 01:42.9 4.6s" [ref=e2644] [cursor=pointer]:
+                  - generic [ref=e2645]:
+                    - generic [ref=e2646]: T9
+                    - generic [ref=e2647]: 01:38.3
+                  - generic [ref=e2648]: 01:38.3 - 01:42.9
+                  - generic [ref=e2649]: 4.6s
+                - button "T10 01:42.9 01:42.9 - 01:47.1 4.3s" [ref=e2650] [cursor=pointer]:
+                  - generic [ref=e2651]:
+                    - generic [ref=e2652]: T10
+                    - generic [ref=e2653]: 01:42.9
+                  - generic [ref=e2654]: 01:42.9 - 01:47.1
+                  - generic [ref=e2655]: 4.3s
+                - button "T11 01:47.1 01:47.1 - 01:52.5 5.4s" [ref=e2656] [cursor=pointer]:
+                  - generic [ref=e2657]:
+                    - generic [ref=e2658]: T11
+                    - generic [ref=e2659]: 01:47.1
+                  - generic [ref=e2660]: 01:47.1 - 01:52.5
+                  - generic [ref=e2661]: 5.4s
+                - button "T12 01:52.5 01:52.5 - 01:59.2 6.7s" [ref=e2662] [cursor=pointer]:
+                  - generic [ref=e2663]:
+                    - generic [ref=e2664]: T12
+                    - generic [ref=e2665]: 01:52.5
+                  - generic [ref=e2666]: 01:52.5 - 01:59.2
+                  - generic [ref=e2667]: 6.7s
+                - button "T13 01:59.2 01:59.2 - 02:06.7 7.5s" [ref=e2668] [cursor=pointer]:
+                  - generic [ref=e2669]:
+                    - generic [ref=e2670]: T13
+                    - generic [ref=e2671]: 01:59.2
+                  - generic [ref=e2672]: 01:59.2 - 02:06.7
+                  - generic [ref=e2673]: 7.5s
+                - button "T14 02:06.7 02:06.7 - 02:11.0 4.3s" [ref=e2674] [cursor=pointer]:
+                  - generic [ref=e2675]:
+                    - generic [ref=e2676]: T14
+                    - generic [ref=e2677]: 02:06.7
+                  - generic [ref=e2678]: 02:06.7 - 02:11.0
+                  - generic [ref=e2679]: 4.3s
+                - button "T15 02:11.0 02:11.0 - 02:19.0 8.0s" [ref=e2680] [cursor=pointer]:
+                  - generic [ref=e2681]:
+                    - generic [ref=e2682]: T15
+                    - generic [ref=e2683]: 02:11.0
+                  - generic [ref=e2684]: 02:11.0 - 02:19.0
+                  - generic [ref=e2685]: 8.0s
+                - button "T16 02:19.0 02:19.0 - 02:24.5 5.6s" [ref=e2686] [cursor=pointer]:
+                  - generic [ref=e2687]:
+                    - generic [ref=e2688]: T16
+                    - generic [ref=e2689]: 02:19.0
+                  - generic [ref=e2690]: 02:19.0 - 02:24.5
+                  - generic [ref=e2691]: 5.6s
+                - button "T17 02:24.5 02:24.5 - 02:29.6 5.1s" [ref=e2692] [cursor=pointer]:
+                  - generic [ref=e2693]:
+                    - generic [ref=e2694]: T17
+                    - generic [ref=e2695]: 02:24.5
+                  - generic [ref=e2696]: 02:24.5 - 02:29.6
+                  - generic [ref=e2697]: 5.1s
+                - button "T18 02:29.6 02:29.6 - 02:42.3 12.7s" [ref=e2698] [cursor=pointer]:
+                  - generic [ref=e2699]:
+                    - generic [ref=e2700]: T18
+                    - generic [ref=e2701]: 02:29.6
+                  - generic [ref=e2702]: 02:29.6 - 02:42.3
+                  - generic [ref=e2703]: 12.7s
+                - button "T19 02:42.3 02:42.3 - 02:46.7 4.4s" [ref=e2704] [cursor=pointer]:
+                  - generic [ref=e2705]:
+                    - generic [ref=e2706]: T19
+                    - generic [ref=e2707]: 02:42.3
+                  - generic [ref=e2708]: 02:42.3 - 02:46.7
+                  - generic [ref=e2709]: 4.4s
+                - button "T20 02:46.7 02:46.7 - 02:50.3 3.6s" [ref=e2710] [cursor=pointer]:
+                  - generic [ref=e2711]:
+                    - generic [ref=e2712]: T20
+                    - generic [ref=e2713]: 02:46.7
+                  - generic [ref=e2714]: 02:46.7 - 02:50.3
+                  - generic [ref=e2715]: 3.6s
+                - button "T21 02:50.3 02:50.3 - 03:05.2 14.9s lento" [ref=e2716] [cursor=pointer]:
+                  - generic [ref=e2717]:
+                    - generic [ref=e2718]: T21
+                    - generic [ref=e2719]: 02:50.3
+                  - generic [ref=e2720]: 02:50.3 - 03:05.2
+                  - generic [ref=e2721]:
+                    - text: 14.9s
+                    - generic [ref=e2722]: lento
+                - button "T22 03:05.2 03:05.2 - 03:10.6 5.4s" [ref=e2723] [cursor=pointer]:
+                  - generic [ref=e2724]:
+                    - generic [ref=e2725]: T22
+                    - generic [ref=e2726]: 03:05.2
+                  - generic [ref=e2727]: 03:05.2 - 03:10.6
+                  - generic [ref=e2728]: 5.4s
+                - button "T23 03:10.6 03:10.6 - 03:15.9 5.3s" [ref=e2729] [cursor=pointer]:
+                  - generic [ref=e2730]:
+                    - generic [ref=e2731]: T23
+                    - generic [ref=e2732]: 03:10.6
+                  - generic [ref=e2733]: 03:10.6 - 03:15.9
+                  - generic [ref=e2734]: 5.3s
+                - button "T24 03:15.9 03:15.9 - 03:20.8 4.8s" [ref=e2735] [cursor=pointer]:
+                  - generic [ref=e2736]:
+                    - generic [ref=e2737]: T24
+                    - generic [ref=e2738]: 03:15.9
+                  - generic [ref=e2739]: 03:15.9 - 03:20.8
+                  - generic [ref=e2740]: 4.8s
+                - button "T25 03:20.8 03:20.8 - 03:24.3 3.6s" [ref=e2741] [cursor=pointer]:
+                  - generic [ref=e2742]:
+                    - generic [ref=e2743]: T25
+                    - generic [ref=e2744]: 03:20.8
+                  - generic [ref=e2745]: 03:20.8 - 03:24.3
+                  - generic [ref=e2746]: 3.6s
+                - button "T26 03:24.3 03:24.3 - 03:29.8 5.5s" [ref=e2747] [cursor=pointer]:
+                  - generic [ref=e2748]:
+                    - generic [ref=e2749]: T26
+                    - generic [ref=e2750]: 03:24.3
+                  - generic [ref=e2751]: 03:24.3 - 03:29.8
+                  - generic [ref=e2752]: 5.5s
+                - button "T27 03:29.8 03:29.8 - 03:36.8 7.0s" [ref=e2753] [cursor=pointer]:
+                  - generic [ref=e2754]:
+                    - generic [ref=e2755]: T27
+                    - generic [ref=e2756]: 03:29.8
+                  - generic [ref=e2757]: 03:29.8 - 03:36.8
+                  - generic [ref=e2758]: 7.0s
+                - button "T28 03:36.8 03:36.8 - 03:42.3 5.5s" [ref=e2759] [cursor=pointer]:
+                  - generic [ref=e2760]:
+                    - generic [ref=e2761]: T28
+                    - generic [ref=e2762]: 03:36.8
+                  - generic [ref=e2763]: 03:36.8 - 03:42.3
+                  - generic [ref=e2764]: 5.5s
+                - button "T29 03:42.3 03:42.3 - 03:48.2 6.0s" [ref=e2765] [cursor=pointer]:
+                  - generic [ref=e2766]:
+                    - generic [ref=e2767]: T29
+                    - generic [ref=e2768]: 03:42.3
+                  - generic [ref=e2769]: 03:42.3 - 03:48.2
+                  - generic [ref=e2770]: 6.0s
+                - button "T30 03:48.2 03:48.2 - 03:55.2 7.0s" [ref=e2771] [cursor=pointer]:
+                  - generic [ref=e2772]:
+                    - generic [ref=e2773]: T30
+                    - generic [ref=e2774]: 03:48.2
+                  - generic [ref=e2775]: 03:48.2 - 03:55.2
+                  - generic [ref=e2776]: 7.0s
+                - button "T31 03:55.2 03:55.2 - 04:01.0 5.8s" [ref=e2777] [cursor=pointer]:
+                  - generic [ref=e2778]:
+                    - generic [ref=e2779]: T31
+                    - generic [ref=e2780]: 03:55.2
+                  - generic [ref=e2781]: 03:55.2 - 04:01.0
+                  - generic [ref=e2782]: 5.8s
+                - button "T32 04:01.0 04:01.0 - 04:05.1 4.1s" [ref=e2783] [cursor=pointer]:
+                  - generic [ref=e2784]:
+                    - generic [ref=e2785]: T32
+                    - generic [ref=e2786]: 04:01.0
+                  - generic [ref=e2787]: 04:01.0 - 04:05.1
+                  - generic [ref=e2788]: 4.1s
+            - generic [ref=e2789]:
+              - generic [ref=e2790]:
+                - generic [ref=e2791]:
+                  - heading "Ritmo ao vivo" [level=2] [ref=e2792]
+                  - paragraph [ref=e2793]: O marcador acompanha o ciclo atual do video.
+                - generic [ref=e2794]: Fora dos ciclos
+              - application [ref=e2797]:
+                - generic [ref=e2846]:
+                  - generic [ref=e2847]:
+                    - generic [ref=e2848]: A1
+                    - generic [ref=e2850]: A2
+                    - generic [ref=e2852]: A3
+                    - generic [ref=e2854]: A4
+                    - generic [ref=e2856]: A5
+                    - generic [ref=e2858]: A6
+                    - generic [ref=e2860]: A7
+                    - generic [ref=e2862]: T8
+                    - generic [ref=e2864]: T9
+                    - generic [ref=e2866]: T10
+                    - generic [ref=e2868]: T12
+                    - generic [ref=e2870]: T14
+                    - generic [ref=e2872]: T16
+                    - generic [ref=e2874]: T18
+                    - generic [ref=e2876]: T20
+                    - generic [ref=e2878]: T22
+                    - generic [ref=e2880]: T24
+                    - generic [ref=e2882]: T26
+                    - generic [ref=e2884]: T28
+                    - generic [ref=e2886]: T30
+                    - generic [ref=e2888]: T32
+                  - generic [ref=e2890]:
+                    - generic [ref=e2891]: "0"
+                    - generic [ref=e2893]: "4"
+                    - generic [ref=e2895]: "8"
+                    - generic [ref=e2897]: "12"
+                    - generic [ref=e2899]: "16"
+          - complementary [ref=e2901]:
+            - generic [ref=e2902]:
+              - heading "Time analisado" [level=2] [ref=e2903]
+              - generic [ref=e2904]: 1 com scout
+            - button "#11329 ICE robotics" [ref=e2906] [cursor=pointer]:
+              - generic [ref=e2907]: "#11329"
+              - generic [ref=e2908]: ICE robotics
+            - generic [ref=e2909]:
+              - generic [ref=e2910]:
+                - generic [ref=e2911]:
+                  - generic [ref=e2912]: Producao total
+                  - generic [ref=e2917]: 86%
+                - generic [ref=e2918]:
+                  - generic [ref=e2919]:
+                    - paragraph [ref=e2920]: "73"
+                    - paragraph [ref=e2921]: Acertos
+                  - generic [ref=e2922]:
+                    - paragraph [ref=e2923]: "12"
+                    - paragraph [ref=e2924]: erros
+                    - paragraph [ref=e2925]: 32 ciclos
+              - generic [ref=e2926]:
+                - generic [ref=e2927]:
+                  - paragraph [ref=e2931]: "20"
+                  - paragraph [ref=e2932]: Acertos auto
+                  - paragraph [ref=e2933]: 0 erros
+                  - paragraph [ref=e2934]: 7 ciclos - 100%
+                - generic [ref=e2935]:
+                  - paragraph [ref=e2940]: "53"
+                  - paragraph [ref=e2941]: Acertos teleop
+                  - paragraph [ref=e2942]: 12 erros
+                  - paragraph [ref=e2943]: 25 ciclos - 82%
+                - generic [ref=e2944]:
+                  - paragraph [ref=e2948]: T8
+                  - paragraph [ref=e2949]: Mais rapido teleop
+                  - paragraph [ref=e2950]: 2.3s
+                - generic [ref=e2951]:
+                  - paragraph [ref=e2954]: T21
+                  - paragraph [ref=e2955]: Mais lento teleop
+                  - paragraph [ref=e2956]: 14.9s
+              - generic [ref=e2957]:
+                - generic [ref=e2958]:
+                  - paragraph [ref=e2959]: Teleop por 30s
+                  - generic [ref=e2960]: 53 acertos teleop
+                - generic [ref=e2961]:
+                  - generic [ref=e2962]:
+                    - generic [ref=e2963]:
+                      - generic [ref=e2964]: 0-30s
+                      - generic [ref=e2965]: 15 acertos
+                    - paragraph [ref=e2968]:
+                      - generic [ref=e2969]: 0 erros
+                      - text: "- 15 tentativas - 5 ciclos - 4.6s med. - 100%"
+                  - generic [ref=e2970]:
+                    - generic [ref=e2971]:
+                      - generic [ref=e2972]: 30-60s
+                      - generic [ref=e2973]: 14 acertos
+                    - paragraph [ref=e2976]:
+                      - generic [ref=e2977]: 0 erros
+                      - text: "- 14 tentativas - 5 ciclos - 6.1s med. - 100%"
+                  - generic [ref=e2978]:
+                    - generic [ref=e2979]:
+                      - generic [ref=e2980]: 60-90s
+                      - generic [ref=e2981]: 10 acertos
+                    - paragraph [ref=e2984]:
+                      - generic [ref=e2985]: 0 erros
+                      - text: "- 10 tentativas - 4 ciclos - 8.9s med. - 100%"
+                  - generic [ref=e2986]:
+                    - generic [ref=e2987]:
+                      - generic [ref=e2988]: 90-120s
+                      - generic [ref=e2989]: 14 acertos
+                    - paragraph [ref=e2992]:
+                      - generic [ref=e2993]: 12 erros
+                      - text: "- 26 tentativas - 11 ciclos - 5.4s med. - 54%"
+            - generic [ref=e2994]:
+              - paragraph [ref=e2995]: Movimentacoes
+              - paragraph [ref=e2996]: "Em breve: trajetoria, zonas e heatmap local conectados por contrato de dados."
+        - generic [ref=e2998]:
+          - heading "Producao por ciclo" [level=2] [ref=e2999]
+          - application [ref=e3002]:
+            - generic [ref=e3085]:
+              - generic [ref=e3086]:
+                - generic [ref=e3087]: A1
+                - generic [ref=e3089]: A2
+                - generic [ref=e3091]: A3
+                - generic [ref=e3093]: A4
+                - generic [ref=e3095]: A5
+                - generic [ref=e3097]: A6
+                - generic [ref=e3099]: A7
+                - generic [ref=e3101]: T8
+                - generic [ref=e3103]: T10
+                - generic [ref=e3105]: T12
+                - generic [ref=e3107]: T14
+                - generic [ref=e3109]: T16
+                - generic [ref=e3111]: T18
+                - generic [ref=e3113]: T20
+                - generic [ref=e3115]: T22
+                - generic [ref=e3117]: T24
+                - generic [ref=e3119]: T26
+                - generic [ref=e3121]: T28
+                - generic [ref=e3123]: T30
+                - generic [ref=e3125]: T32
+              - generic [ref=e3127]:
+                - generic [ref=e3128]: "0"
+                - generic [ref=e3130]: "0.75"
+                - generic [ref=e3132]: "1.5"
+                - generic [ref=e3134]: "2.25"
+                - generic [ref=e3136]: "3"

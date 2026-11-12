@@ -1,0 +1,35 @@
+field:
+  id: "the_code_example"
+  name: "The Code - Arena exemplo"
+  image: "assets/arenas/the_code_topdown.png"
+  unit: "normalized"
+  width: 1000
+  height: 1000
+  coordinate_system:
+    origin: "top_left"
+    x_axis: "right"
+    y_axis: "down"
+
+reference_points:
+  top_left:
+    label: "Canto superior esquerdo"
+    point: [0, 0]
+  top_right:
+    label: "Canto superior direito"
+    point: [1000, 0]
+  bottom_right:
+    label: "Canto inferior direito"
+    point: [1000, 1000]
+  bottom_left:
+    label: "Canto inferior esquerdo"
+    point: [0, 1000]
+
+zones:
+  center:
+    label: "Centro"
+    type: "polygon"
+    points:
+      - [400, 400]
+      - [600, 400]
+      - [600, 600]
+      - [400, 600]

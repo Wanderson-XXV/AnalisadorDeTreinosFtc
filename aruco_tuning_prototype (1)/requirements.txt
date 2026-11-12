@@ -1,0 +1,17 @@
+# ArUco Tuning Prototype - dependencies
+# Core computer vision (aruco is bundled in main opencv package since 4.7)
+opencv-python>=4.7.0
+numpy>=1.23,<2.0
+PyYAML>=6.0
+
+# GUI
+PySide6>=6.5.0
+
+# Plotting (test review / trajectory charts)
+matplotlib>=3.6.0
+
+# Testing
+pytest>=7.0.0
+
+# Optional but recommended for robust math
+scipy>=1.9.0

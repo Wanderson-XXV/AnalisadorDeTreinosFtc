@@ -1,0 +1,101 @@
+<h2>Qual layout combina melhor com o Tactical Replay Visual?</h2>
+<p class="subtitle">Compare como cada direcao organiza video, arena, timeline, metricas e debug. Clique em um card se algum parecer o caminho certo.</p>
+
+<style>
+  .replay-grid { display: grid; grid-template-columns: repeat(3, minmax(240px, 1fr)); gap: 1rem; }
+  @media (max-width: 1000px) { .replay-grid { grid-template-columns: 1fr; } }
+  .replay-card { background: var(--bg-secondary); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; cursor: pointer; transition: all .15s ease; }
+  .replay-card:hover { border-color: var(--accent); transform: translateY(-2px); }
+  .replay-card.selected { border: 2px solid var(--selected-border); background: var(--selected-bg); }
+  .replay-card .mock { padding: .7rem; background: #0b0f14; color: #e8f0f8; aspect-ratio: 16 / 11; display: grid; gap: .45rem; font-size: .65rem; }
+  .mock-header { display: flex; justify-content: space-between; gap: .4rem; align-items: center; background: #111820; border: 1px solid #2a3440; border-radius: 6px; padding: .35rem .45rem; }
+  .metric-row { display: flex; gap: .25rem; flex-wrap: wrap; }
+  .pill { background: #16202a; border: 1px solid #2a3440; border-radius: 999px; padding: .12rem .32rem; color: #a8b3c1; white-space: nowrap; }
+  .video-box, .arena-box, .panel-box, .debug-box, .timeline-box { border: 1px solid #2a3440; border-radius: 6px; background: #111820; min-height: 2rem; padding: .35rem; position: relative; overflow: hidden; }
+  .video-box { background: linear-gradient(135deg, #111820, #05080c); }
+  .arena-box { background: #101820; }
+  .arena-box::before { content: ""; position: absolute; inset: .45rem; border: 1px solid #4da3ff; opacity: .45; }
+  .zone.collect { position: absolute; left: 10%; bottom: 12%; width: 20%; height: 20%; background: rgba(46,232,139,.24); border: 1px solid #2ee88b; }
+  .zone.score { position: absolute; right: 18%; top: 18%; width: 30%; height: 24%; background: rgba(255,210,63,.22); border: 1px solid #ffd23f; }
+  .trail { position: absolute; left: 25%; top: 58%; width: 48%; height: 2px; background: #2ee88b; transform: rotate(-22deg); box-shadow: 0 0 8px #2ee88b; }
+  .robot { position: absolute; left: 62%; top: 41%; width: .7rem; height: .7rem; background: #fff; border: 2px solid #2ee88b; border-radius: 50%; box-shadow: 0 0 10px rgba(46,232,139,.8); }
+  .timeline-box { display: flex; align-items: stretch; gap: .12rem; min-height: 1.3rem; padding: .25rem; }
+  .seg { height: 100%; border-radius: 3px; min-height: .8rem; }
+  .collect { background: #2ee88b; }
+  .transit { background: #4da3ff; }
+  .score { background: #ffd23f; }
+  .stop { background: repeating-linear-gradient(45deg, #ff4d5e, #ff4d5e 4px, #111820 4px, #111820 8px); border: 1px solid #ff8a3d; }
+  .card-body { padding: 1rem; }
+  .card-body p { color: var(--text-secondary); font-size: .88rem; margin-top: .2rem; }
+  .two-col { display: grid; grid-template-columns: 1.1fr .9fr; gap: .45rem; }
+  .three-row { display: grid; grid-template-rows: auto 1fr auto auto; gap: .45rem; }
+  .arena-first { display: grid; grid-template-columns: 1.25fr .75fr; gap: .45rem; }
+  .debug-layout { display: grid; grid-template-columns: .8fr 1fr .55fr; gap: .45rem; }
+  .tiny-list { display: grid; gap: .2rem; }
+  .tiny-line { height: .35rem; border-radius: 999px; background: #2a3440; }
+</style>
+
+<div class="replay-grid">
+  <div class="replay-card" data-choice="coach-replay" onclick="toggleSelect(this)">
+    <div class="mock three-row">
+      <div class="mock-header">
+        <strong>Treino: teste_robo</strong>
+        <div class="metric-row"><span class="pill">OK 100%</span><span class="pill">Parado 3.2s</span><span class="pill">820cm</span></div>
+      </div>
+      <div class="two-col">
+        <div class="video-box">Video original</div>
+        <div class="arena-box">
+          <div class="zone collect"></div><div class="zone score"></div><div class="trail"></div><div class="robot"></div>
+        </div>
+      </div>
+      <div class="timeline-box">
+        <div class="seg collect" style="width:22%"></div><div class="seg transit" style="width:30%"></div><div class="seg stop" style="width:18%"></div><div class="seg score" style="width:30%"></div>
+      </div>
+      <div class="mock-header"><span>Zona atual: Close Zone</span><span>Estado: stopped</span><span>Vel: 3.2 cm/s</span></div>
+    </div>
+    <div class="card-body">
+      <h3>A. Coach Replay balanceado</h3>
+      <p>Video e arena tem peso parecido; timeline vira a navegacao principal. Melhor ponto de partida para tecnico, driver e aluno revisarem juntos.</p>
+    </div>
+  </div>
+
+  <div class="replay-card" data-choice="arena-first" onclick="toggleSelect(this)">
+    <div class="mock arena-first">
+      <div class="arena-box">
+        <div class="zone collect"></div><div class="zone score"></div><div class="trail" style="width:60%; top:54%;"></div><div class="robot" style="left:68%; top:38%;"></div>
+      </div>
+      <div style="display:grid; gap:.45rem;">
+        <div class="video-box">Video menor</div>
+        <div class="panel-box">
+          <div class="tiny-list"><div class="tiny-line" style="width:80%"></div><div class="tiny-line" style="width:55%"></div><div class="tiny-line" style="width:70%"></div></div>
+        </div>
+        <div class="timeline-box">
+          <div class="seg collect" style="width:25%"></div><div class="seg transit" style="width:25%"></div><div class="seg stop" style="width:20%"></div><div class="seg score" style="width:30%"></div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>B. Arena-first</h3>
+      <p>A arena fica dominante e o video vira confirmacao. Bom quando a pergunta principal e rota, zona e parada, mas pode esconder detalhes do video.</p>
+    </div>
+  </div>
+
+  <div class="replay-card" data-choice="debug-split" onclick="toggleSelect(this)">
+    <div class="mock debug-layout">
+      <div class="video-box">Video + bbox</div>
+      <div class="arena-box">
+        <div class="zone collect"></div><div class="zone score"></div><div class="trail"></div><div class="robot"></div>
+      </div>
+      <div class="debug-box">
+        <div class="tiny-list"><div class="tiny-line" style="width:90%"></div><div class="tiny-line" style="width:75%"></div><div class="tiny-line" style="width:82%"></div><div class="tiny-line" style="width:60%"></div><div class="tiny-line" style="width:70%"></div></div>
+      </div>
+      <div class="timeline-box" style="grid-column: 1 / 4;">
+        <div class="seg collect" style="width:18%"></div><div class="seg transit" style="width:22%"></div><div class="seg stop" style="width:18%"></div><div class="seg score" style="width:22%"></div><div class="seg transit" style="width:20%"></div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>C. Lab/debug com painel fixo</h3>
+      <p>Muito bom para diagnosticar tracker, ROI e coordenadas. Menos limpo para treino, porque detalhes tecnicos competem com a revisao tatica.</p>
+    </div>
+  </div>
+</div>

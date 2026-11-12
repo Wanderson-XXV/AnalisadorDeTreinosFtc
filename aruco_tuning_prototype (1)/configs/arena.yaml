@@ -1,0 +1,12 @@
+arena:
+  name: Arena de Testes LEGO
+  width_mm: 2000.0
+  height_mm: 1000.0
+  origin: top-left
+  x_axis: right
+  y_axis: down
+  background_image: ''
+  # Zonas são opcionais. Carregue um arquivo de zonas separado pela
+  # interface (Arena → Configurar arena → Zonas → Carregar YAML).
+  # Veja configs/zones_example.yaml para o formato.
+  zones: []

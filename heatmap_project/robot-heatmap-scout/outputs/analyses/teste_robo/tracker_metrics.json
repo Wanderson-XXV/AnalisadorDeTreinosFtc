@@ -1,0 +1,22 @@
+{
+  "total_frames": 400,
+  "tracking_ok_frames": 400,
+  "tracking_failed_frames": 0,
+  "tracking_ok_percent": 100.0,
+  "roi_reselections": 0,
+  "tracking_lost_count": 0,
+  "duration_seconds": 13.936,
+  "corrections_per_minute": 0.0,
+  "longest_segment_without_reselect_seconds": 13.303,
+  "processing_seconds": 33.037,
+  "analysis_name": "teste_robo",
+  "analysis_dir": "outputs\\analyses\\teste_robo",
+  "video_path": "..\\..\\..\\videos\\teste_robo.mp4",
+  "calibration_path": "..\\..\\..\\calibrations\\decode_sala_camera_quadro_1.yaml",
+  "field_path": "..\\..\\..\\configs\\fields\\decode.yaml",
+  "arena_image": "..\\..\\..\\assets\\arenas\\decode_hd_2.png",
+  "tracker": "CSRT",
+  "speed": "4",
+  "field_width": 365.76,
+  "field_height": 365.76
+}

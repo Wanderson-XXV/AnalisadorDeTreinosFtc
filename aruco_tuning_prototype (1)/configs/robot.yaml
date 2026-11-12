@@ -1,0 +1,12 @@
+robot:
+  name: Robo LEGO 1
+  marker_dictionary: DICT_4X4_50
+  marker_id: 0
+  marker_length_mm: 80.0
+  white_margin_mm: 10.0
+  marker_height_mm: 60.0
+  offset_x_mm: 0.0
+  offset_y_mm: 0.0
+  offset_heading_deg: 0.0
+  robot_width_mm: 150.0
+  robot_length_mm: 200.0

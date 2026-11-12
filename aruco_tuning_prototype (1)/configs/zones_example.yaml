@@ -1,0 +1,53 @@
+# ==========================================================================
+# Exemplo de arquivo de zonas para a arena
+# ==========================================================================
+#
+# Zonas são regiões nomeadas dentro da arena. Servem para:
+#   - Identificar em qual região o robô está durante um teste
+#   - Registrar zone_id no positions.csv
+#   - Visualizar as regiões no painel da arena virtual
+#
+# Cada zona é um polígono definido por vértices em milímetros,
+# usando o mesmo sistema de coordenadas da arena (origem top-left,
+# X para a direita, Y para baixo).
+#
+# Campos:
+#   id:       identificador único (usado no CSV)
+#   name:     nome legível para exibição
+#   type:     tipo livre (start, target, obstacle, etc.)
+#   color:    cor HTML para a visualização
+#   polygon:  lista de [x_mm, y_mm] — pelo menos 3 vértices
+#
+# Para carregar: Arena → Configurar arena → Zonas → Carregar YAML
+# ==========================================================================
+
+zones:
+  - id: partida
+    name: Zona de Partida
+    type: start
+    color: '#2ecc71'
+    polygon:
+      - [100.0, 100.0]
+      - [500.0, 100.0]
+      - [500.0, 500.0]
+      - [100.0, 500.0]
+
+  - id: chegada
+    name: Zona de Chegada
+    type: target
+    color: '#e74c3c'
+    polygon:
+      - [1500.0, 500.0]
+      - [1900.0, 500.0]
+      - [1900.0, 900.0]
+      - [1500.0, 900.0]
+
+  - id: obstaculo
+    name: Obstáculo Central
+    type: obstacle
+    color: '#f39c12'
+    polygon:
+      - [900.0, 350.0]
+      - [1100.0, 350.0]
+      - [1100.0, 650.0]
+      - [900.0, 650.0]

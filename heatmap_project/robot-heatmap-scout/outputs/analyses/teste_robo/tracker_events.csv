@@ -1,0 +1,3 @@
+event,frame,time_seconds,detail
+roi_selected,19,0.633,initial
+finished,418,13.936,tracker stopped

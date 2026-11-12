@@ -1,0 +1,22 @@
+{
+  "total_frames": 1864,
+  "tracking_ok_frames": 1864,
+  "tracking_failed_frames": 0,
+  "tracking_ok_percent": 100.0,
+  "roi_reselections": 0,
+  "tracking_lost_count": 0,
+  "duration_seconds": 31.981,
+  "corrections_per_minute": 0.0,
+  "longest_segment_without_reselect_seconds": 31.342,
+  "processing_seconds": 163.984,
+  "analysis_name": "decode_v1",
+  "analysis_dir": "outputs\\analyses\\decode_v1",
+  "video_path": "..\\..\\..\\..\\robot_heatmap_agent_context\\videos\\v1.mp4",
+  "calibration_path": "..\\..\\..\\calibrations\\decode_v1.yaml",
+  "field_path": "..\\..\\..\\configs\\fields\\decode.yaml",
+  "arena_image": "..\\..\\..\\assets\\arenas\\decode_hd_2.png",
+  "tracker": "CSRT",
+  "speed": "4",
+  "field_width": 365.76,
+  "field_height": 365.76
+}

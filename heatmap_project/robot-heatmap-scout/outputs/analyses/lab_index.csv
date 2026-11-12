@@ -1,0 +1,7 @@
+analysis_name,analysis_dir,video_path,tracker,speed,tracking_ok_percent,corrections_per_minute,roi_reselections,tracking_lost_count,duration_seconds,processing_seconds
+decode_v1,outputs\analyses\decode_v1,..\..\..\..\robot_heatmap_agent_context\videos\v1.mp4,CSRT,4,100.0,1.178,2,0,101.898,345.06
+decode_v1,outputs\analyses\decode_v1,..\..\..\..\robot_heatmap_agent_context\videos\v1.mp4,CSRT,4,100.0,0.0,0,0,31.981,163.984
+teste_robo,outputs\analyses\teste_robo,..\..\..\videos\teste_robo.mp4,CSRT,4,100.0,0.0,0,0,13.936,35.363
+teste_robo,outputs\analyses\teste_robo,..\..\..\videos\teste_robo.mp4,CSRT,4,100.0,8.611,2,0,13.936,60.089
+teste_robo,outputs\analyses\teste_robo,..\..\..\videos\teste_robo.mp4,CSRT,4,100.0,0.0,0,0,2.2,4582.225
+teste_robo,outputs\analyses\teste_robo,..\..\..\videos\teste_robo.mp4,CSRT,4,100.0,0.0,0,0,13.936,33.037

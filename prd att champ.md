@@ -2,6 +2,8 @@
 
 ## Product Requirements Document v1.1
 
+php -S localhost:8000 -t api
+
 **Projeto:** AnalisadorDeTreinosFtc - Extensão para Campeonatos  
 **Temporada:** INTO THE DEEP 2024-2025 (Season-Specific)  
 **Data:** 3 de Março de 2026  
@@ -58,17 +60,17 @@ O sistema atual permite análise de rounds de treino da própria equipe. A nova 
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│                      FRONTEND (React)                        │
+│                      FRONTEND (React)                       
 │  ┌─────────────┐ ┌─────────────┐ ┌─────────────┐            │
 │  │ RoundTimer  │ │  Dashboard  │ │   History   │            │
 │  │    .tsx     │ │    .tsx     │ │    .tsx     │            │
 │  └──────┬──────┘ └──────┬──────┘ └──────┬──────┘            │
-│         │               │               │                    │
+│         │               │               │                   │
 │  ┌──────┴───────────────┴───────────────┴──────┐            │
-│  │              Custom Hooks                     │            │
-│  │  useRounds  useCycles  useStats  useTimer    │            │
-│  └──────────────────┬───────────────────────────┘            │
-│                     │ fetch                                  │
+│  │              Custom Hooks                    │           │
+│  │  useRounds  useCycles  useStats  useTimer    │           │
+│  └──────────────────┬───────────────────────────┘           │
+│                     │ fetch                                 │
 └─────────────────────┼───────────────────────────────────────┘
                       │ HTTP/JSON
 ┌─────────────────────┼───────────────────────────────────────┐

@@ -1,0 +1,60 @@
+                <button
+                  onClick={() => { setSearch(''); setTypeFilter('all'); setStatusFilter('all'); }}
+                  className="mt-3 text-sm text-orange-400 hover:text-orange-300 transition-colors"
+                >
+                  Limpar filtros
+                </button>
+              )}
+            </div>
+          )}
+
+          {!loadingModal && (
+            <div className="space-y-3">
+              {filtered.map(match => (
+                <MatchListCard
+                  key={match.id}
+                  match={match}
+                  teamsMap={teamsMap}
+                  assignments={assignments}
+                  onView={() => handleView(match)}
+                  onDelete={() => handleDelete(match.id)}
+                />
+              ))}
+            </div>
+          )}
+        </div>
+      </main>
+
+      {showForm && (
+        <MatchForm
+          match={editMatch}
+          onSave={handleSave}
+          onClose={() => { setShowForm(false); setEditMatch(null); }}
+        />
+      )}
+
+      {showBulkForm && (
+        <BulkMatchForm
+          onDone={() => { /* matches will refetch */ }}
+          onClose={() => setShowBulkForm(false)}
+        />
+      )}
+
+      {viewMatch && (
+        <MatchModal
+          match={viewMatch}
+          teamsMap={teamsMap}
+          assignments={assignments}
+          onClose={() => setViewMatch(null)}
+          onEdit={() => {
+            setEditMatch(viewMatch);
+            setViewMatch(null);
+            setShowForm(true);
+          }}
+          onDelete={() => handleDelete(viewMatch.id)}
+          onStartScouting={handleStartScouting}
+        />
+      )}
+    </div>
+  );
+}

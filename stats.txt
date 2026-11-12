@@ -20,6 +20,55 @@ api/scouting.php (rounds + cycles + lock)
 MatchModal.tsx básico com botão "Scout This Team"
 ChampionshipTimer.tsx (RoundTimer adaptado com header de partida/equipe)
 Teste: fluxo completo de scouting de uma equipe numa partida
+
 PASSO 5 — Stats + polish (próxima conversa)
 
 scouting-stats.php, comparação de equipes, etc.
+5.1 — Backend: api/scouting.php
+
+Endpoint POST /scouting.php — cria um scouting_round (recebe match_id, team_number, scout_id), marca is_locked=1 e locked_at=NOW, retorna o registro criado com scout_username.
+Endpoint GET /scouting.php?id=X — retorna o scouting_round com seus scouting_cycles embutidos.
+Endpoint PATCH /scouting.php?id=X — finaliza o scouting (end_time, total_duration, observations, robot_issues, strategy_notes, is_locked=0).
+Endpoint DELETE /scouting.php?id=X — cancela/exclui o scouting_round e seus cycles.
+Valida duplicata via UNIQUE(match_id, team_number) já existente — retorna 409 se já existe.
+5.2 — Backend: api/scouting_cycles.php
+
+POST — cria um scouting_cycle (mesmo schema do cycles.php mas vinculado a scouting_round_id).
+PATCH?id=X — edita hits/misses/zone de um cycle existente.
+5.3 — Frontend: rota /scouting/:id
+
+Adicionar em routes.ts: route("scouting/:id", "routes/scouting.tsx").
+scouting.tsx faz GET /scouting.php?id=X no loader/useEffect e renderiza o ChampionshipTimer.
+5.4 — Frontend: ChampionshipTimer.tsx
+
+Clonar RoundTimer.tsx e adaptar:
+Header mostra match.display_name + #teamNumber + alliance color.
+Usa scouting.php / scouting_cycles.php em vez de rounds.php / cycles.php.
+Ao finalizar, chama PATCH /scouting.php?id=X (desbloqueia + salva observations/robot_issues/strategy_notes).
+Ao cancelar, chama DELETE /scouting.php?id=X.
+Campos extras: robot_issues e strategy_notes junto de observations.
+5.5 — Frontend: conectar o botão "Scout"
+
+Em championships.tsx, substituir o alert no handleStartScouting:
+POST /scouting.php com { match_id, team_number, scout_id }.
+Recebe o scouting_round criado.
+navigate(/scouting/${scoutingRound.id}).
+5.6 — Frontend: useScoutingRound.ts
+
+Hook que encapsula: fetch do scouting_round, addCycle, editCycle, finish, cancel.
+Usado pelo ChampionshipTimer.
+
+
+Passo 6 — Stats de Scouting
+
+api/scouting_stats.php — agregações por equipe (maior total, maior telop, avg teleop, avg auton, avg all, avg cycle time, hit rate, cycles por partida, auto vs teleop).
+Página /scouting-stats com tabela comparativa de equipes e filtros.
+Passo 7 — Visualização de scouting concluído
+
+Ao clicar "Ver" no TeamCardInMatch (quando scouting está concluído), abrir modal/página mostrando os cycles registrados, observations, robot_issues, strategy_notes.
+Passo 8 — Polish
+
+Tratamento de lock expirado (se alguém travou e não finalizou, timeout automático).
+Atualização do match.status para in_progress/completed conforme scoutings são feitos.
+Notificações/toasts em vez de alert().
+Responsividade e UX geral.
